@@ -16,10 +16,40 @@ For each derived publisher name (see [Naming, replicas, and for_each](/terraform
 3. **Token** — `POST {tenant_url}/api/v2/infrastructure/publishers/{id}/registration_token`
    returns `data.token`. One call per publisher.
 4. **User-data render** — the token is interpolated into a cloud-init
-   document containing `runcmd: - [ /home/ubuntu/npa_publisher_wizard, -token, "<token>" ]`.
+   document. The runcmd shape depends on `bootstrap` (see below).
 5. **VM provision** — the platform submodule attaches the rendered
-   user-data to the VM. On first boot, cloud-init runs the wizard, which
-   registers the publisher with the tenant.
+   user-data to the VM. On first boot, cloud-init runs the rendered
+   `runcmd`, which (in bootstrap mode) installs the wizard via
+   `bootstrap.sh` and then registers the publisher with the tenant.
+
+## Cloud-init runcmd (pre-baked image — `bootstrap = false`)
+
+```yaml
+runcmd:
+  - su - ubuntu -c 'sudo /home/ubuntu/npa_publisher_wizard -token "<TOKEN>"'
+```
+
+The wizard binary is already on disk (baked into the Netskope Publisher
+image), so cloud-init just calls it with the per-publisher token.
+
+## Cloud-init runcmd (bootstrap mode — `bootstrap = true`, v2.3+)
+
+```yaml
+runcmd:
+  - chmod 0600 /etc/netplan/60-cloudinit-override.yaml  # only if guest_network_interface set
+  - netplan apply                                        # only if guest_network_interface set
+  - pkill -KILL -u ubuntu || true                        # only if install_user != "ubuntu"
+  - userdel -r ubuntu 2>/dev/null || true                # only if install_user != "ubuntu"
+  - chmod 1777 /tmp
+  - install -d -o <user> -g <user> -m 0755 /home/<user>/resources   # only if nonat
+  - install -o <user> -g <user> -m 0644 /dev/null /home/<user>/resources/.nonat  # only if nonat
+  - su - <user> -c 'curl -fsSL https://s3-us-west-2.amazonaws.com/publisher.netskope.com/latest/generic/bootstrap.sh | sudo bash'
+  - su - <user> -c 'sudo /home/<user>/npa_publisher_wizard -token "<TOKEN>"'
+```
+
+Where `<user>` is `install_user` (default `ubuntu`). The bootstrap step
+installs the wizard onto a stock Ubuntu image; the registration step then
+runs from the install user's home, not a hard-coded `/home/ubuntu`.
 
 ## Idempotency
 

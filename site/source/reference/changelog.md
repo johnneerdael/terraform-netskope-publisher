@@ -8,6 +8,53 @@ The authoritative changelog lives in the repo as
 
 Latest releases are summarized below.
 
+## [2.3.0] — 2026-05-19
+
+**Script-based installation on stock Ubuntu 22.04 LTS Minimal.**
+`modules/cloudinit` can now run Netskope's `bootstrap.sh` during first
+boot, so the AWS / Azure / GCP submodules no longer require a pre-baked
+Netskope Publisher image. New common inputs forwarded by all three
+VM submodules: `bootstrap`, `bootstrap_url`, `nonat`, `install_user`,
+`install_user_password` (+ `_is_hash`), `install_user_ssh_authorized_keys`,
+`delete_default_user`, `guest_network_interface`. `wizard_path` is now
+nullable and derives from `/home/<install_user>/npa_publisher_wizard`.
+
+Per-platform changes:
+
+- **GCP** defaults flipped to `bootstrap = true` and `nonat = true`
+  (No-NAT mode for the 1460-byte MTU). `examples/gcp-single` defaults to
+  the public Canonical Ubuntu 22.04 LTS Minimal image family.
+- **AWS** auto-resolves Canonical's Ubuntu Minimal AMI (owner
+  `099720109477`) under `bootstrap = true`; the Netskope AMI lookup is
+  skipped in that mode so callers no longer need marketplace access.
+- **Azure** defaults the marketplace reference to Canonical
+  `0001-com-ubuntu-minimal-jammy / minimal-22_04-lts-gen2` under
+  `bootstrap = true` (no `plan {}` block required). `admin_username`
+  coalesces to `install_user` so the Azure admin and the cloud-init
+  install user are always the same account.
+
+Pre-baked-image users on AWS and Azure see no behavior change
+(`bootstrap` defaults to `false` there). GCP users pinning a Netskope
+image must explicitly set `bootstrap = false` and `nonat = false`.
+
+## [2.2.0] — 2026-05-19
+
+Kubernetes submodule (`modules/kubernetes`) installing the
+[`kubernetes-netskope-publisher`](https://github.com/johnneerdael/kubernetes-netskope-publisher)
+Helm chart on any K8s cluster. Two enrollment modes: `token` (Terraform
+owns the publisher record, feeds it via a per-publisher Kubernetes
+Secret) and `api` (chart container self-registers via the Netskope API
+on Pod start). DX parity with the other submodules (`name_prefix`,
+`replicas`, `names`, `publisher_names`). `examples/kubernetes-kind/`
+runnable example targeting a local Kind cluster.
+
+## [2.1.0] — 2026-05-18
+
+Hyper-V submodule (`modules/hyperv`) cloning publishers from a
+host-cached master VHDX, NoCloud seed ISO built on the host via IMAPI2
+PowerShell. New `metadata_raw` output on `modules/cloudinit`.
+`examples/hyperv-single/` runnable example.
+
 ## [2.0.0] — 2026-05-18
 
 **Breaking.** The multi-platform root module is removed. Source

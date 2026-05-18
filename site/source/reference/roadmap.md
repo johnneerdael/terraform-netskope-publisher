@@ -25,7 +25,15 @@ use today.
 > Kubernetes shipped in v2.2.0 (covers vanilla K8s, EKS, AKS, GKE,
 > OpenShift via the K8s API) — see
 > [Kubernetes platform inputs](/terraform-netskope-publisher/admin/module/platforms/kubernetes/).
+>
+> Script-based installation on stock Ubuntu 22.04 LTS Minimal shipped in
+> v2.3.0 for AWS / Azure / GCP — see
+> [BYO image](/terraform-netskope-publisher/admin/how-to/byo-image/).
 
+- **Bootstrap mode for vSphere and Hyper-V.** v2.3 added the
+  bootstrap-on-stock-Ubuntu path only to the public-cloud submodules.
+  Extending it to vSphere (Ubuntu cloud OVA + guestinfo cloud-init) and
+  Hyper-V (Ubuntu cloud VHDX + NoCloud ISO) is the next logical step.
 - **Nutanix AHV** via `nutanix/nutanix` (native `guest_customization.cloud_init`).
 - **KVM** via `dmacvicar/libvirt` (cloud-init via NoCloud ISO).
 - **Per-platform Kubernetes wrappers** (`modules/eks-publisher`,

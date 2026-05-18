@@ -114,6 +114,16 @@ module "publisher" {
 
 ## GCP
 
+> **GCP's default 1460-byte MTU** is lower than the 1500-byte default that
+> the Linux masquerade + conntrack path assumes. To avoid fragmented or
+> dropped packets at the publisher, Netskope recommends running the
+> Publisher in **No-NAT mode** on GCP: traffic is proxied directly from
+> the egress NIC instead of being SNAT'd. `modules/gcp` defaults
+> `nonat = true`, which drops an empty `~install_user/resources/.nonat`
+> file during cloud-init. The Publisher service detects the marker on
+> startup and switches into No-NAT mode. Set `nonat = false` only if you
+> have a specific reason to revert.
+
 `modules/gcp` exposes **`assign_public_ip`** which controls whether the
 instance gets an `access_config {}` block (external IPv4).
 

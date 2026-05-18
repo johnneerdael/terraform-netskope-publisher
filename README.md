@@ -14,7 +14,8 @@ cloud-init (VM platforms), or Helm (Kubernetes).
 
 ```hcl
 module "publisher" {
-  source = "github.com/johnneerdael/terraform-netskope-publisher//modules/aws?ref=v2.0.0"
+  source  = "johnneerdael/publisher/netskope//modules/aws"
+  version = "~> 2.3"
 
   name_prefix = "pub-eu"
   replicas    = 2
@@ -25,12 +26,31 @@ module "publisher" {
   subnet_id          = "subnet-…"
   security_group_ids = ["sg-…"]
   key_name           = "my-key"
+
+  # v2.3: boot a stock Canonical Ubuntu 22.04 LTS Minimal AMI and install
+  # the Publisher via Netskope's bootstrap.sh during cloud-init. Drop this
+  # line (or set bootstrap = false) to keep using a pre-baked Netskope AMI.
+  bootstrap = true
 }
 ```
 
 For other platforms, source the matching submodule:
 `//modules/azure`, `//modules/gcp`, `//modules/vsphere`, `//modules/hyperv`,
 `//modules/kubernetes`.
+
+## Two install paths (v2.3+)
+
+Each VM submodule (`aws`, `azure`, `gcp`) supports two ways of getting the
+Publisher onto the box:
+
+| Mode | Image | When to pick it |
+|---|---|---|
+| **Bootstrap** (`bootstrap = true`) | Stock Canonical Ubuntu 22.04 LTS Minimal — auto-resolved per platform | No marketplace subscription needed; lets you customise the install user, password, SSH keys, and netplan interface in cloud-init |
+| **Pre-baked image** (`bootstrap = false`, default on AWS/Azure) | Netskope Publisher AMI / marketplace image / GCP image | Fastest first boot; image is already validated and signed by Netskope |
+
+GCP defaults to `bootstrap = true` and `nonat = true` (the 1460-byte MTU
+makes No-NAT mode the recommended setup). AWS and Azure default to
+`bootstrap = false` so existing deployments keep working unchanged.
 
 ## Install via the Terraform Registry
 
@@ -40,7 +60,7 @@ This module is published at
 ```hcl
 module "publisher" {
   source  = "johnneerdael/publisher/netskope//modules/aws"
-  version = "~> 2.1"
+  version = "~> 2.3"
   # ...
 }
 ```
@@ -57,7 +77,9 @@ v1 root module that routed on a `platform` variable forced consumers to
 configure all four cloud providers, which was a usability bug. v2
 removes it.
 
-## Inputs (common to every submodule)
+## Inputs (common to every VM submodule)
+
+### Identity / sizing
 
 | Name | Type | Default | Description |
 |---|---|---|---|
@@ -67,10 +89,24 @@ removes it.
 | `tags` | map(string) | `{}` | Tags / labels per platform |
 | `tenant_url` | string | — | e.g. `https://tenant.goskope.com` |
 | `api_token` | string (sensitive) | — | NPA API token |
-| `wizard_path` | string | `/home/ubuntu/npa_publisher_wizard` | On-VM wizard path |
 
-Platform-specific inputs (subnets, image refs, etc.) are documented in
-each submodule's `variables.tf` and on the docs site.
+### Cloud-init / bootstrap (v2.3+)
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `bootstrap` | bool | `true` on GCP, `false` on AWS/Azure | Run Netskope's generic `bootstrap.sh` during cloud-init on a stock Ubuntu image. Set to `false` to use a pre-baked Netskope Publisher image. |
+| `bootstrap_url` | string | Netskope public S3 URL | Override the bootstrap script URL (private mirror, air-gap, etc.). |
+| `nonat` | bool | `true` on GCP, `false` on AWS/Azure | Create `~install_user/resources/.nonat` to enable Netskope's No-NAT mode (recommended on GCP because of the 1460-byte MTU). |
+| `wizard_path` | string | `null` → `/home/<install_user>/npa_publisher_wizard` | Absolute path to `npa_publisher_wizard` on the VM. Leave null to derive from `install_user`. |
+| `install_user` | string | `"ubuntu"` | Linux user that owns the Publisher install. When different from `"ubuntu"`, **replaces** the image's default `ubuntu` user (it is removed by cloud-init when `delete_default_user = true`). |
+| `install_user_password` | string (sensitive) | `null` | Optional password for `install_user`. Null = SSH-key-only login. |
+| `install_user_password_is_hash` | bool | `false` | `true` if `install_user_password` is already a `crypt(3)` hash. |
+| `install_user_ssh_authorized_keys` | list(string) | `[]` | Public keys installed in `~install_user/.ssh/authorized_keys`. |
+| `delete_default_user` | bool | `true` | When `install_user != "ubuntu"`, cloud-init removes the original `ubuntu` account (`userdel -r ubuntu`). Set false to keep both. |
+| `guest_network_interface` | object | `null` | Optional netplan override for the primary OS interface. Fields: `name`, `dhcp4`, `addresses`, `gateway4`, `nameservers`, `mtu`. Null leaves the image's DHCP setup alone. |
+
+Platform-specific inputs (subnets, image refs, instance sizes, etc.) are
+documented in each submodule's `variables.tf` and on the docs site.
 
 ## Outputs
 

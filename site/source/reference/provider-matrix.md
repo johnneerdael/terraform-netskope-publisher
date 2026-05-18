@@ -34,3 +34,18 @@ Older Terraform will still run the module itself.
 
 Only the provider for the submodule you source is loaded — the others
 are never instantiated.
+
+## Bootstrap-mode base images (v2.3+)
+
+When `bootstrap = true` and no platform-specific image is set, the
+module auto-resolves a stock Canonical Ubuntu 22.04 LTS Minimal image:
+
+| Submodule | Image source | Reference |
+|---|---|---|
+| `modules/aws` | AMI lookup | Owner `099720109477` (Canonical); name pattern `ubuntu-minimal/images/hvm-ssd*/ubuntu-jammy-22.04-amd64-minimal-*`; x86_64; hvm |
+| `modules/azure` | Marketplace reference | `Canonical / 0001-com-ubuntu-minimal-jammy / minimal-22_04-lts-gen2 / latest` (no `plan {}` required) |
+| `modules/gcp` | Image family | `projects/ubuntu-os-cloud/global/images/family/ubuntu-minimal-2204-lts` |
+
+`bootstrap.sh` is downloaded from
+`https://s3-us-west-2.amazonaws.com/publisher.netskope.com/latest/generic/bootstrap.sh`
+by default; override with the `bootstrap_url` input.

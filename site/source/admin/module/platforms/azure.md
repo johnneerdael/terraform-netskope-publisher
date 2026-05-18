@@ -12,8 +12,6 @@ toc: true
 
 ## Inputs
 
-The `azure = { ... }` object accepts:
-
 | Name | Type | Default | Description |
 |---|---|---|---|
 | `resource_group_name` | string | required | RG the VM and NIC live in. |
@@ -21,7 +19,7 @@ The `azure = { ... }` object accepts:
 | `subnet_id` | string | required | Full subnet resource ID. |
 | `admin_ssh_public_key` | string | required | SSH public key for the admin user. |
 | `vm_size` | string | `"Standard_D2s_v5"` | VM SKU. |
-| `admin_username` | string | `"ubuntu"` | Linux admin username (cloud-init wizard runs as this user). |
+| `admin_username` | string | `null` → coalesces to `install_user` | Azure VM admin user. v2.3 coalesces to `install_user` so the Azure admin and the cloud-init install user are always the same account. |
 | `network_security_group_id` | string | `null` | NSG to attach at NIC level. |
 | `assign_public_ip` | bool | `false` | Create + attach a Standard public IP. |
 | `os_disk.type` | string | `"Premium_LRS"` | OS disk storage type. |
@@ -30,14 +28,56 @@ The `azure = { ... }` object accepts:
 | `marketplace` | object | `null` | Marketplace image: `{ publisher, offer, sku, version }`. |
 | `accept_marketplace_terms` | bool | `false` | When true and `marketplace` is set, creates `azurerm_marketplace_agreement`. |
 
-Exactly one of `image_id` or `marketplace` must be non-null (enforced by
-a VM-level precondition).
+See [Common inputs](/terraform-netskope-publisher/admin/module/common-inputs/)
+for `bootstrap`, `bootstrap_url`, `nonat`, `install_user`,
+`install_user_password`, `install_user_ssh_authorized_keys`,
+`delete_default_user`, `guest_network_interface`, and `wizard_path`
+(all v2.3+).
+
+Exactly one of `image_id`, `marketplace`, **or** `bootstrap = true` must
+be set (enforced by a VM-level precondition). When `bootstrap = true`
+and neither `image_id` nor `marketplace` is set, the module defaults the
+marketplace reference to Canonical's Ubuntu 22.04 LTS Minimal (see
+below).
+
+## Bootstrap mode — Canonical default (v2.3+)
+
+```hcl
+module "publisher" {
+  source  = "johnneerdael/publisher/netskope//modules/azure"
+  version = "~> 2.3"
+
+  tenant_url = var.netskope_tenant_url
+  api_token  = var.netskope_api_token
+
+  resource_group_name  = "rg-npa"
+  location             = "westeurope"
+  subnet_id            = "/subscriptions/.../subnets/sn"
+  admin_ssh_public_key = file("~/.ssh/id_rsa.pub")
+
+  bootstrap = true
+}
+```
+
+The module emits a `source_image_reference` for the Canonical image:
+
+| Field | Value |
+|---|---|
+| publisher | `Canonical` |
+| offer | `0001-com-ubuntu-minimal-jammy` |
+| sku | `minimal-22_04-lts-gen2` |
+| version | `latest` |
+
+No `plan {}` block is emitted (Canonical images don't require marketplace
+terms acceptance), and `accept_marketplace_terms` is irrelevant in this
+mode. Cloud-init runs `bootstrap.sh` then registers via the API token.
 
 ## Minimal example (custom image)
 
 ```hcl
 module "publisher" {
-  source = "github.com/johnneerdael/terraform-netskope-publisher//modules/azure?ref=v2.0.0"
+  source  = "johnneerdael/publisher/netskope//modules/azure"
+  version = "~> 2.3"
 
   tenant_url = var.netskope_tenant_url
   api_token  = var.netskope_api_token
@@ -50,11 +90,12 @@ module "publisher" {
 }
 ```
 
-## Minimal example (Marketplace)
+## Minimal example (Netskope Marketplace)
 
 ```hcl
 module "publisher" {
-  source = "github.com/johnneerdael/terraform-netskope-publisher//modules/azure?ref=v2.0.0"
+  source  = "johnneerdael/publisher/netskope//modules/azure"
+  version = "~> 2.3"
 
   tenant_url = var.netskope_tenant_url
   api_token  = var.netskope_api_token

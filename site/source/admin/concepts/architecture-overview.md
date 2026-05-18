@@ -21,12 +21,28 @@ Each platform submodule calls two shared submodules:
 - `modules/registration` — talks to the Netskope NPA API via the `http`
   provider (list → create-if-missing → token).
 - `modules/cloudinit` — renders a cloud-init user-data document
-  containing `/home/ubuntu/npa_publisher_wizard -token <token>`.
+  containing `sudo <wizard_path> -token <token>` (run as `install_user`)
+  and, in bootstrap mode, the `curl … bootstrap.sh | sudo bash` step that
+  installs the wizard onto a stock Ubuntu image first.
 
 The platform submodule then provisions one VM per derived publisher name
 with `for_each`, attaching the rendered user-data via the cloud-specific
 mechanism (`user_data_base64` / `custom_data` / `metadata.user-data` /
 `extra_config.guestinfo.userdata`).
+
+## Two install paths (v2.3+)
+
+| Path | Image | Cloud-init runcmd |
+|---|---|---|
+| **Bootstrap** (`bootstrap = true`) | Stock Canonical Ubuntu 22.04 LTS Minimal — auto-resolved per platform | `chmod 1777 /tmp` → write `~/resources/.nonat` (when `nonat=true`) → `curl … bootstrap.sh \| sudo bash` → `npa_publisher_wizard -token …` |
+| **Pre-baked** (`bootstrap = false`) | Netskope Publisher AMI / marketplace image / GCE image / OVA / VHDX | `npa_publisher_wizard -token …` |
+
+GCP defaults to bootstrap mode (`bootstrap = true`, `nonat = true`) so
+the public Ubuntu Minimal family works out of the box and Netskope's
+No-NAT mode is applied for the 1460-byte MTU. AWS and Azure default to
+the pre-baked path for backward compatibility; flipping `bootstrap = true`
+on either causes the module to auto-resolve a stock Canonical AMI /
+marketplace image instead.
 
 ## Provider isolation
 

@@ -53,7 +53,8 @@ variable "netskope_api_token" {
 }
 
 module "publisher" {
-  source = "github.com/johnneerdael/terraform-netskope-publisher//modules/aws?ref=v2.0.0"
+  source  = "johnneerdael/publisher/netskope//modules/aws"
+  version = "~> 2.3"
 
   name_prefix = "my-first-publisher"
   replicas    = 1
@@ -64,6 +65,12 @@ module "publisher" {
   subnet_id          = "subnet-REPLACE-ME"
   security_group_ids = ["sg-REPLACE-ME"]
   key_name           = "npa-publisher-key"
+
+  # v2.3: boot a stock Canonical Ubuntu 22.04 LTS Minimal AMI and install
+  # the Publisher via Netskope's bootstrap.sh during cloud-init. No
+  # marketplace subscription needed. Set bootstrap = false (and pass
+  # ami_id) to use a pre-baked Netskope Publisher AMI instead.
+  bootstrap = true
 
   # The starter assumes a public subnet. If your subnet has NAT instead,
   # drop this line.
@@ -97,7 +104,14 @@ Apply:
 terraform apply
 ```
 
-Type `yes` when prompted. Wait ~2 minutes for the EC2 instance to boot
-and for cloud-init to run the publisher registration wizard.
+Type `yes` when prompted. The EC2 instance boots in about 2 minutes, but
+because `bootstrap = true` makes cloud-init download and install the
+Publisher software on first boot, **registration takes ~5–10 minutes
+total**. The Netskope console will show the publisher Offline at first,
+then Online once `bootstrap.sh` finishes and the wizard runs.
+
+If you'd rather skip the bootstrap step, set `bootstrap = false` and
+provide `ami_id = "ami-..."` pointing at a pre-baked Netskope Publisher
+AMI — registration then completes within ~2 minutes of `apply`.
 
 Next → [Verify it's online](/terraform-netskope-publisher/starter/07-verify-online/)

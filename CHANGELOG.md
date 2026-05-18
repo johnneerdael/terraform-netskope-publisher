@@ -6,6 +6,77 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-05-19
+
+### Added
+- **Script-based installation on stock Ubuntu 22.04 LTS Minimal.**
+  `modules/cloudinit` can now download and run Netskope's generic
+  `bootstrap.sh` during first boot instead of relying on a pre-baked
+  Netskope Publisher image. New common inputs (forwarded by the
+  AWS / Azure / GCP submodules):
+  - `bootstrap` (bool) — toggle the script install
+  - `bootstrap_url` (string) — overridable, defaults to
+    `https://s3-us-west-2.amazonaws.com/publisher.netskope.com/latest/generic/bootstrap.sh`
+  - `nonat` (bool) — drops `~install_user/resources/.nonat` to enable
+    Netskope's No-NAT mode (recommended on GCP due to the 1460-byte MTU)
+- **Customisable install user.** `install_user` (default `ubuntu`)
+  *replaces* the image's default user when different —
+  `system_info.default_user.name` is rewired and the original `ubuntu`
+  account is removed by cloud-init (`delete_default_user`, default
+  `true`). New flat inputs: `install_user_password` (sensitive,
+  plaintext or `install_user_password_is_hash` for a `crypt(3)` hash),
+  `install_user_ssh_authorized_keys`.
+- **Per-VM netplan override.** New `guest_network_interface` input
+  (object with `name`, `dhcp4`, `addresses`, `gateway4`, `nameservers`,
+  `mtu`) renders `/etc/netplan/60-cloudinit-override.yaml` and runs
+  `netplan apply` before the bootstrap step. Default is `null` —
+  cloud-init leaves the image's DHCP setup alone.
+- **GCP submodule** now defaults to `bootstrap = true` and
+  `nonat = true`. `examples/gcp-single` defaults to the public
+  `projects/ubuntu-os-cloud/global/images/family/ubuntu-minimal-2204-lts`
+  family.
+- **AWS submodule** auto-resolves Canonical's Ubuntu 22.04 LTS Minimal
+  AMI (owner `099720109477`, name pattern
+  `ubuntu-minimal/images/hvm-ssd*/ubuntu-jammy-22.04-amd64-minimal-*`)
+  whenever `bootstrap = true` and `ami_id` is null. The Netskope
+  Publisher AMI lookup is skipped in that mode (so callers no longer
+  need access to the Netskope marketplace listing).
+- **Azure submodule** auto-resolves the Canonical marketplace image
+  (`Canonical / 0001-com-ubuntu-minimal-jammy / minimal-22_04-lts-gen2`,
+  no `plan {}` block required) whenever `bootstrap = true` and neither
+  `image_id` nor `marketplace` is set. `admin_username` now coalesces
+  to `install_user` so the Azure admin and the cloud-init install user
+  are the same account.
+
+### Changed
+- `wizard_path` is now nullable on `modules/{cloudinit,aws,azure,gcp}`.
+  When null it derives from `install_user` as
+  `/home/<install_user>/npa_publisher_wizard`. The previous static
+  default (`/home/ubuntu/npa_publisher_wizard`) still resolves
+  identically when `install_user` is left at its default.
+- Cloud-init runcmd ordering is now explicit:
+  `netplan apply` → optional `userdel -r ubuntu` →
+  `chmod 1777 /tmp` → write `~/resources/.nonat` →
+  `curl … bootstrap.sh | sudo bash` → `npa_publisher_wizard -token …`,
+  with the bootstrap and registration commands both running as
+  `install_user` via `su -`. Enrollment no longer hard-codes
+  `/home/ubuntu`.
+- `package_update: true` removed from the rendered user-data;
+  `bootstrap.sh` owns all `apt` activity so cloud-init's apt module
+  cannot race against `dpkg` locks.
+
+### Notes
+- AWS and Azure pre-baked-image users see **no behavior change**:
+  `bootstrap` defaults to `false` on both submodules, and the Netskope
+  AMI / marketplace lookup paths are preserved unchanged.
+- GCP callers who were pinning a pre-baked Publisher image must now set
+  `bootstrap = false` and `nonat = false` explicitly when sourcing the
+  module to retain v2.2 behavior.
+- Tests added: `aws_bootstrap_mode_uses_canonical_ubuntu_ami`,
+  `renders_bootstrap_and_nonat`, `renders_custom_user_replaces_ubuntu`,
+  `renders_static_network_override`. Total `terraform test` suite:
+  8 runs, all green.
+
 ## [2.2.0] - 2026-05-19
 
 ### Added
