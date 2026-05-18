@@ -1,0 +1,5 @@
+#cloud-config
+hostname: ${publisher_name}
+preserve_hostname: false
+runcmd:
+  - [ ${wizard_path}, -token, "${registration_token}" ]
