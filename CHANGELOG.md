@@ -6,6 +6,33 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-05-18
+
+### Changed (BREAKING)
+- The multi-platform **root module is removed**. Source one of the
+  per-platform submodules instead:
+  `github.com/johnneerdael/terraform-netskope-publisher//modules/<platform>?ref=v2.0.0`
+  (`<platform>` is one of `aws`, `azure`, `gcp`, `vsphere`).
+- Submodule input renames vs. the old root module:
+  `netskope_tenant_url` → `tenant_url`, `netskope_api_token` → `api_token`.
+  Platform-specific inputs (e.g. `subnet_id`) are now flat instead of
+  nested under `aws = { ... }`.
+
+### Added
+- Each submodule now accepts `name_prefix`, `replicas`, and `names`
+  inputs (parity with v1 root-module ergonomics).
+- Each submodule emits a `publisher_names` output for callers that
+  need the derived list.
+
+### Why
+v1's root module declared all four platform submodules. Terraform
+configures every declared provider regardless of `count`, so v1 consumers
+were forced to configure `azurerm`/`google`/`vsphere` even when only AWS
+was in use. Removing the root module eliminates that requirement.
+
+### Migration
+See the README "Migration from v1.x" table.
+
 ## [1.1.1] - 2026-05-18
 
 ### Fixed

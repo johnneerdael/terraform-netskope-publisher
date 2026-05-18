@@ -4,70 +4,73 @@
 > — starter walkthrough for first-time Terraform users + complete admin
 > reference for AWS / Azure / GCP / vSphere.
 
-Provision Netskope Private Access Publishers on **AWS**, **Azure**, **GCP**, or
-**vSphere** from a single Terraform module. Publishers are created via the
-Netskope NPA API and registered on first boot through cloud-init — no
-out-of-band wizard runs.
+Provision Netskope Private Access Publishers on **AWS**, **Azure**, **GCP**,
+or **vSphere** via the Netskope NPA API and cloud-init.
 
 ## Quick start
 
 ```hcl
 module "publisher" {
-  source   = "github.com/johnneerdael/terraform-netskope-publisher?ref=v1.0.0"
-  platform = "aws"
+  source = "github.com/johnneerdael/terraform-netskope-publisher//modules/aws?ref=v2.0.0"
 
   name_prefix = "pub-eu"
   replicas    = 2
 
-  netskope_tenant_url = "https://tenant.goskope.com"
-  netskope_api_token  = var.netskope_api_token
+  tenant_url = var.netskope_tenant_url
+  api_token  = var.netskope_api_token
 
-  aws = {
-    subnet_id          = "subnet-…"
-    security_group_ids = ["sg-…"]
-    key_name           = "my-key"
-  }
+  subnet_id          = "subnet-…"
+  security_group_ids = ["sg-…"]
+  key_name           = "my-key"
 }
 ```
 
-Switch platform by changing `platform = "azure"` / `"gcp"` / `"vsphere"` and
-populating the matching input object.
+For Azure / GCP / vSphere, source the matching submodule:
+`//modules/azure`, `//modules/gcp`, `//modules/vsphere`.
 
-## Inputs (common)
+## Why per-platform submodules
+
+Each submodule declares only the providers it needs. Sourcing
+`//modules/aws` pulls in `aws`, `http`, `cloudinit` — nothing else. The
+v1 root module that routed on a `platform` variable forced consumers to
+configure all four cloud providers, which was a usability bug. v2
+removes it.
+
+## Inputs (common to every submodule)
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `platform` | string | — | `aws` \| `azure` \| `gcp` \| `vsphere` |
-| `name_prefix` | string | `"npa-publisher"` | Used when `names` is null |
-| `names` | list(string) | `null` | Explicit publisher names |
-| `replicas` | number | `1` | Number of publishers when `names` is null |
+| `name_prefix` | string | `"npa-publisher"` | Used to derive names when `names` is null |
+| `names` | list(string) | `null` | Explicit publisher names; overrides `name_prefix` + `replicas` |
+| `replicas` | number | `1` | Number of publishers to derive |
 | `tags` | map(string) | `{}` | Tags / labels per platform |
-| `netskope_tenant_url` | string | — | e.g. `https://tenant.goskope.com` |
-| `netskope_api_token` | string (sensitive) | — | NPA API token |
+| `tenant_url` | string | — | e.g. `https://tenant.goskope.com` |
+| `api_token` | string (sensitive) | — | NPA API token |
 | `wizard_path` | string | `/home/ubuntu/npa_publisher_wizard` | On-VM wizard path |
 
-Platform-specific inputs live in each submodule's `variables.tf`. See the
-examples in `examples/`.
+Platform-specific inputs (subnets, image refs, etc.) are documented in
+each submodule's `variables.tf` and on the docs site.
 
 ## Outputs
 
 ```hcl
 output "publishers" {
-  # Map: name => { publisher_id, vm_id, private_ip, public_ip, platform }
-  # sensitive (contains registration_token transitively)
+  # Map: name => { publisher_id, vm_id, private_ip, public_ip, registration_token }
+  # sensitive (registration_token is inside)
 }
-
-output "registration_tokens" {
-  # Map: name => token (sensitive)
+output "publisher_names" {
+  # The derived list of names (useful when you used name_prefix+replicas)
 }
 ```
 
-## Registration flow
+## Migration from v1.x
 
-1. `data "http" "list"` → `GET /api/v2/infrastructure/publishers`
-2. For each name missing in the response → `POST /publishers`
-3. For every name → `POST /publishers/{id}/registration_token`
-4. Cloud-init runcmd on the VM: `/home/ubuntu/npa_publisher_wizard -token <token>`
+| v1.x (root module) | v2.0.0 (submodule) |
+|---|---|
+| `source = "...?ref=v1.x"` + `platform = "aws"` | `source = "...//modules/aws?ref=v2.0.0"` |
+| `netskope_tenant_url = ...` | `tenant_url = ...` |
+| `netskope_api_token = ...` | `api_token = ...` |
+| `aws = { subnet_id = …, security_group_ids = … }` | `subnet_id = …`, `security_group_ids = …` (flat) |
 
 ## Requirements
 
@@ -82,12 +85,6 @@ output "registration_tokens" {
 terraform init -backend=false
 terraform test
 ```
-
-Plan-time tests cover the cloud-init renderer, the Netskope API registration
-flow, and the AWS submodule end-to-end with mocked providers. The
-`azurerm`/`google`/`vsphere` providers authenticate at configure time even for
-`command = plan`, so those submodules are covered by `terraform validate`
-(per submodule + per example) plus the runnable examples in `examples/`.
 
 ## License
 
