@@ -60,6 +60,9 @@ module "publisher" {
   security_group_ids          = ["sg-..."]
   key_name                    = "my-key"
   instance_type               = "t3.large"
+  # false assumes the subnet has NAT (or another egress path). Flip to true
+  # for a public subnet. See:
+  # /terraform-netskope-publisher/admin/concepts/connectivity/
   associate_public_ip_address = false
   iam_instance_profile        = "ssm-managed"
   ebs_optimized               = true

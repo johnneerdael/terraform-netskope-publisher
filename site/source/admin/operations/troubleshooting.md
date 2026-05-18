@@ -49,7 +49,9 @@ but can't reach Netskope's gateways. Check the VM's subnet has either:
 - A `0.0.0.0/0 → nat-...` route via a NAT gateway.
 
 If neither is true, the publisher will never register no matter what
-the wizard does.
+the wizard does. The full per-platform recipe (AWS, Azure, GCP,
+vSphere) with HCL examples lives at
+[Connectivity requirements](/terraform-netskope-publisher/admin/concepts/connectivity/).
 
 SSH in and inspect cloud-init logs (find the public IP via
 `terraform state show` or `aws ec2 describe-instances`):

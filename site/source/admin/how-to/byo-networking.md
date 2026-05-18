@@ -27,6 +27,10 @@ The publisher needs outbound TCP/443 to the Netskope regional gateway
 infrastructure. The exact destination set depends on your tenant;
 consult Netskope documentation for current FQDNs / IP ranges.
 
+For per-platform recipes (public IP vs NAT gateway vs Cloud NAT vs
+on-prem firewall) with working HCL, see
+[Connectivity requirements](/terraform-netskope-publisher/admin/concepts/connectivity/).
+
 ## Optional ingress
 
 SSH (TCP/22) from your operator subnet is useful for troubleshooting.

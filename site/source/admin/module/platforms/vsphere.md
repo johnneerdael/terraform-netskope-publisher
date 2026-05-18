@@ -4,6 +4,11 @@ date: 2026-05-18
 toc: true
 ---
 
+> ⚠️ The publisher VM needs outbound TCP/443 to your Netskope tenant.
+> vSphere routing is entirely on-prem and not modeled by this module —
+> see [Connectivity requirements → vSphere](/terraform-netskope-publisher/admin/concepts/connectivity/)
+> for the firewall, DNS, and (optional) proxy considerations.
+
 ## Inputs
 
 The `vsphere = { ... }` object accepts:

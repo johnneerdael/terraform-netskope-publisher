@@ -10,6 +10,7 @@ running `terraform-netskope-publisher` in production.
 - [Architecture overview](/terraform-netskope-publisher/admin/concepts/architecture-overview/)
 - [Registration flow](/terraform-netskope-publisher/admin/concepts/registration-flow/)
 - [Naming, replicas, and for_each](/terraform-netskope-publisher/admin/concepts/naming-replicas-foreach/)
+- [Connectivity requirements](/terraform-netskope-publisher/admin/concepts/connectivity/)
 
 ## Module reference
 - [Common inputs](/terraform-netskope-publisher/admin/module/common-inputs/)

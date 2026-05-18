@@ -4,6 +4,12 @@ date: 2026-05-18
 toc: true
 ---
 
+> ⚠️ The publisher VM needs outbound TCP/443. See
+> [Connectivity requirements → Azure](/terraform-netskope-publisher/admin/concepts/connectivity/)
+> for the supported shapes (`assign_public_ip = true`, NAT Gateway on
+> the subnet, or Azure Firewall / NVA). Misconfiguring this is the
+> single most common cause of "publisher never goes Online".
+
 ## Inputs
 
 The `azure = { ... }` object accepts:
