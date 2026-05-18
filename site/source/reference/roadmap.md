@@ -8,12 +8,12 @@ use today.
 
 ## Module features
 
-- **`force_token_rotation` input** — first-class flag for replacing
-  registration tokens. Today: use the
+- **`force_token_rotation` input** on each submodule — first-class flag
+  for replacing registration tokens. Today: use the
   [taint-based workaround](/terraform-netskope-publisher/admin/how-to/rotate-token/).
-- **`delete_publisher_on_destroy` input** — opt-in deletion of the
-  tenant publisher record when `terraform destroy` runs. Today:
-  [delete manually or via API](/terraform-netskope-publisher/admin/how-to/delete-publisher/).
+- **`delete_publisher_on_destroy` input** on each submodule — opt-in
+  deletion of the tenant publisher record when `terraform destroy`
+  runs. Today: [delete manually or via API](/terraform-netskope-publisher/admin/how-to/delete-publisher/).
 - **`terraform-docs` auto-generation** of per-platform input tables.
   Today: hand-maintained Markdown in `site/source/admin/module/`.
 

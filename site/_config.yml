@@ -26,4 +26,4 @@ new_post_name:  :title.md
 theme: cactus
 
 # Surfaced into page footers via hexo-injector (Task 3).
-module_version: v1.x
+module_version: v2.x
