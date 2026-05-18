@@ -22,3 +22,4 @@ terraform.rc
 .idea/
 .vscode/
 *.swp
+docs/superpowers/
