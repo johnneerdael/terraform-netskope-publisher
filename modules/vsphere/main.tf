@@ -2,7 +2,7 @@ module "registration" {
   source          = "../registration"
   tenant_url      = var.tenant_url
   api_token       = var.api_token
-  publisher_names = var.publisher_names
+  publisher_names = local.publisher_names
 }
 
 module "cloudinit" {
@@ -43,7 +43,7 @@ data "vsphere_virtual_machine" "template" {
 }
 
 resource "vsphere_virtual_machine" "publisher" {
-  for_each = toset(var.publisher_names)
+  for_each = toset(local.publisher_names)
 
   name             = each.key
   resource_pool_id = var.cluster != null ? data.vsphere_compute_cluster.cluster[0].resource_pool_id : data.vsphere_host.host[0].resource_pool_id
