@@ -2,7 +2,7 @@ module "registration" {
   source          = "../registration"
   tenant_url      = var.tenant_url
   api_token       = var.api_token
-  publisher_names = var.publisher_names
+  publisher_names = local.publisher_names
 }
 
 module "cloudinit" {
@@ -22,7 +22,7 @@ data "aws_ami" "publisher" {
 }
 
 resource "aws_instance" "publisher" {
-  for_each = toset(var.publisher_names)
+  for_each = toset(local.publisher_names)
 
   ami                         = coalesce(var.ami_id, data.aws_ami.publisher.id)
   instance_type               = var.instance_type

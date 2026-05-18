@@ -1,5 +1,6 @@
 variables {
-  publisher_names    = ["pub-eu-1", "pub-eu-2"]
+  name_prefix        = "pub-eu"
+  replicas           = 2
   tenant_url         = "https://tenant.example.goskope.com"
   api_token          = "MOCK-API-TOKEN"
   subnet_id          = "subnet-0123456789abcdef0"
