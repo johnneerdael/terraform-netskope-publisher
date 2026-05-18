@@ -8,15 +8,16 @@ date: 2026-05-18
 ## Run a redundant pair
 
 Change `replicas = 1` to `replicas = 2` and `terraform apply` again. The
-module creates two publishers with distinct registration tokens, both
-sharing the rest of your config.
+module creates `my-first-publisher-1` and `my-first-publisher-2`, each
+registered with its own token and provisioned on its own EC2 instance.
 
 See [How-to: Provision an HA pair](/terraform-netskope-publisher/admin/how-to/ha-pair/).
 
 ## Use a different cloud
 
-The same module deploys to Azure, GCP, or vSphere — just change
-`platform = "azure"` and supply the platform input object. See the
+The same project ships submodules for Azure, GCP, and vSphere. Source
+`//modules/azure`, `//modules/gcp`, or `//modules/vsphere` instead of
+`//modules/aws`, and pass that platform's inputs. See the
 [per-platform reference pages](/terraform-netskope-publisher/admin/module/platforms/aws/).
 
 ## Production hardening
