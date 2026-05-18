@@ -1,7 +1,7 @@
 output "publishers" {
   sensitive = true
   value = {
-    for n in var.publisher_names : n => {
+    for n in local.publisher_names : n => {
       publisher_id       = module.registration.publishers[n].publisher_id
       registration_token = module.registration.publishers[n].registration_token
       vm_id              = google_compute_instance.publisher[n].instance_id
@@ -12,10 +12,15 @@ output "publishers" {
 }
 
 output "instance_ids" {
-  value = [for n in var.publisher_names : google_compute_instance.publisher[n].instance_id]
+  value = [for n in local.publisher_names : google_compute_instance.publisher[n].instance_id]
 }
 
 output "user_data_by_name" {
-  value     = { for n in var.publisher_names : n => google_compute_instance.publisher[n].metadata["user-data"] }
+  value     = { for n in local.publisher_names : n => google_compute_instance.publisher[n].metadata["user-data"] }
   sensitive = true
+}
+
+output "publisher_names" {
+  description = "Derived publisher names (useful when name_prefix+replicas was used)."
+  value       = local.publisher_names
 }
