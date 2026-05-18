@@ -24,11 +24,23 @@ Pick one close to where your private apps live. This guide uses
 ## 3.2 Get a subnet + security group
 
 If you already have a VPC: note the subnet ID (`subnet-...`) and security
-group ID (`sg-...`). The subnet must have a route to a NAT gateway or
-internet gateway.
+group ID (`sg-...`).
 
-If you don't have one yet: use the AWS console's "VPC → Create VPC" with
-the "VPC, subnets, etc." preset. One public subnet is fine for testing.
+> ⚠️ **The publisher needs outbound TCP/443 to reach Netskope.** Without
+> it, the wizard runs on first boot but can't register, and the publisher
+> stays Offline forever. Two ways to give it outbound access:
+>
+> - **Public subnet** (simplest for testing): the subnet's route table
+>   has `0.0.0.0/0 → igw-...`. Pair this with
+>   `associate_public_ip_address = true` in the next step.
+> - **Private subnet + NAT gateway**: subnet route table has
+>   `0.0.0.0/0 → nat-...`. The publisher gets internet egress via NAT.
+>
+> Check in the AWS console: VPC → Subnets → your subnet → Route Table.
+
+If you don't have a VPC yet: use the AWS console's "VPC → Create VPC"
+with the "VPC, subnets, etc." preset. One public subnet is fine for
+testing.
 
 For the security group, the minimum is:
 

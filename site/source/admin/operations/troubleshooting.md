@@ -41,7 +41,18 @@ credentials. Even `terraform plan` requires valid auth — see
 
 ### Publisher never goes Online
 
-SSH in and inspect cloud-init logs:
+**Most common cause: no outbound 443.** The wizard runs at first boot
+but can't reach Netskope's gateways. Check the VM's subnet has either:
+
+- A `0.0.0.0/0 → igw-...` route AND the VM has a public IP
+  (`associate_public_ip_address = true`), or
+- A `0.0.0.0/0 → nat-...` route via a NAT gateway.
+
+If neither is true, the publisher will never register no matter what
+the wizard does.
+
+SSH in and inspect cloud-init logs (find the public IP via
+`terraform state show` or `aws ec2 describe-instances`):
 
 ```bash
 ssh -i ~/.ssh/your-key.pem ubuntu@<public-ip>

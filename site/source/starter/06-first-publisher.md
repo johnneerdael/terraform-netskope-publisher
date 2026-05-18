@@ -62,6 +62,10 @@ module "publisher" {
   subnet_id          = "subnet-REPLACE-ME"
   security_group_ids = ["sg-REPLACE-ME"]
   key_name           = "npa-publisher-key"
+
+  # The starter assumes a public subnet. If your subnet has NAT instead,
+  # drop this line.
+  associate_public_ip_address = true
 }
 
 output "publishers" {
