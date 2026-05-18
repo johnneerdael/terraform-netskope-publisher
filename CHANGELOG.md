@@ -6,6 +6,21 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-05-18
+
+### Added
+- Public docs site at https://johnneerdael.github.io/terraform-netskope-publisher/
+  (Hexo + Cactus, dark colorscheme).
+  - Starter Guide (9 pages, macOS + Windows) from zero Terraform to a
+    first AWS publisher Online in the Netskope console.
+  - Admin Guides: Concepts, Module reference (root + per-platform),
+    How-to (HA, BYO image/networking, multi-region, rotate, delete),
+    Operations (state, secrets, upgrades, troubleshooting).
+  - Reference: provider compatibility matrix, changelog, roadmap.
+- GitHub Actions workflow `.github/workflows/pages.yml` builds and
+  deploys to `gh-pages` on every push touching `site/**`.
+- README banner linking the docs site.
+
 ## [1.0.0] - 2026-05-18
 
 ### Changed

@@ -1,5 +1,9 @@
 # terraform-netskope-publisher
 
+> 📖 **Full guides:** https://johnneerdael.github.io/terraform-netskope-publisher/
+> — starter walkthrough for first-time Terraform users + complete admin
+> reference for AWS / Azure / GCP / vSphere.
+
 Provision Netskope Private Access Publishers on **AWS**, **Azure**, **GCP**, or
 **vSphere** from a single Terraform module. Publishers are created via the
 Netskope NPA API and registered on first boot through cloud-init — no
