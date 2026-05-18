@@ -1,0 +1,4 @@
+netskope_tenant_url = "https://tenant.goskope.com"
+netskope_api_token  = "..."
+kubeconfig_path     = "~/.kube/config"
+kube_context        = "kind-netskope-demo"
