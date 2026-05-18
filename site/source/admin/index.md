@@ -20,6 +20,7 @@ running `terraform-netskope-publisher` in production.
   - [Azure](/terraform-netskope-publisher/admin/module/platforms/azure/)
   - [GCP](/terraform-netskope-publisher/admin/module/platforms/gcp/)
   - [vSphere](/terraform-netskope-publisher/admin/module/platforms/vsphere/)
+  - [Hyper-V](/terraform-netskope-publisher/admin/module/platforms/hyperv/)
 
 ## How-to
 - [Provision an HA pair](/terraform-netskope-publisher/admin/how-to/ha-pair/)

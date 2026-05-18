@@ -25,3 +25,4 @@ Substitute `aws` with `azure`, `gcp`, or `vsphere`.
 - [Azure](/terraform-netskope-publisher/admin/module/platforms/azure/)
 - [GCP](/terraform-netskope-publisher/admin/module/platforms/gcp/)
 - [vSphere](/terraform-netskope-publisher/admin/module/platforms/vsphere/)
+- [Hyper-V](/terraform-netskope-publisher/admin/module/platforms/hyperv/)
