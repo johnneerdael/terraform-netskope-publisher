@@ -6,6 +6,33 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-05-19
+
+### Added
+- New `modules/kubernetes` submodule installs the
+  [`kubernetes-netskope-publisher`](https://github.com/johnneerdael/kubernetes-netskope-publisher)
+  Helm chart from `oci://ghcr.io/johnneerdael/charts` on any K8s
+  cluster (EKS / AKS / GKE / OpenShift / vanilla / Kind).
+- Two enrollment modes:
+  - `token` (default): Terraform owns the publisher record via
+    `npa_publisher` + `npa_publisher_token` from our provider, feeds the
+    token to the chart through a per-publisher Kubernetes Secret.
+  - `api`: chart's container self-registers via the Netskope API on Pod
+    start. Suited to HPA / StatefulSet autoscaling.
+- DX parity with the other submodules: `name_prefix`, `replicas`,
+  `names`, `publisher_names` output.
+- `examples/kubernetes-kind/` runnable example targeting a local Kind
+  cluster.
+- Docs site: new Kubernetes platform page, connectivity section,
+  provider matrix entry, architecture row, roadmap update.
+
+### Notes
+- `wizard_path` common input is not consumed by `modules/kubernetes`
+  (chart image carries the wizard).
+- Plan-time test omitted (same `helm`/`kubernetes` provider eager-config
+  trap as `azurerm`/`google`/`vsphere`/`hyperv`); covered by
+  `terraform validate` + the runnable example.
+
 ## [2.1.1] - 2026-05-18
 
 ### Added

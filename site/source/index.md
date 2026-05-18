@@ -8,7 +8,7 @@ date: 2026-05-18
 > &nbsp;&nbsp;·&nbsp;&nbsp;Provider → [`johnneerdael/netskope-publisher`](https://registry.terraform.io/providers/johnneerdael/netskope-publisher) (unofficial; resources `npa_publisher`, `npa_publisher_token`)
 
 Provision Netskope Private Access Publishers on **AWS**, **Azure**, **GCP**,
-**vSphere**, or **Hyper-V** from a single Terraform module.
+**vSphere**, **Hyper-V**, or **Kubernetes** from a single Terraform module.
 
 - New to Terraform? → [Starter Guide](/terraform-netskope-publisher/starter/)
 - Looking for module reference? → [Admin Guides](/terraform-netskope-publisher/admin/)

@@ -7,7 +7,8 @@
 > reference for AWS / Azure / GCP / vSphere.
 
 Provision Netskope Private Access Publishers on **AWS**, **Azure**, **GCP**,
-**vSphere**, or **Hyper-V** via the Netskope NPA API and cloud-init.
+**vSphere**, **Hyper-V**, or **Kubernetes** via the Netskope NPA API,
+cloud-init (VM platforms), or Helm (Kubernetes).
 
 ## Quick start
 
@@ -28,7 +29,8 @@ module "publisher" {
 ```
 
 For other platforms, source the matching submodule:
-`//modules/azure`, `//modules/gcp`, `//modules/vsphere`, `//modules/hyperv`.
+`//modules/azure`, `//modules/gcp`, `//modules/vsphere`, `//modules/hyperv`,
+`//modules/kubernetes`.
 
 ## Install via the Terraform Registry
 
