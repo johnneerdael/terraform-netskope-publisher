@@ -4,7 +4,7 @@ logo:
   enabled: true
   width: 120
   height: 61
-  url: /images/logo.png
+  url: /images/netskope-logo.png
   gravatar: false
   grayout: false
 
