@@ -23,12 +23,13 @@ Older Terraform will still run the module itself.
 
 ## Required per platform
 
-| `var.platform` | Provider | Source | Version |
+| Submodule | Provider | Source | Version |
 |---|---|---|---|
-| `aws` | `aws` | `hashicorp/aws` | `~> 5.0` |
-| `azure` | `azurerm` | `hashicorp/azurerm` | `~> 4.0` |
-| `gcp` | `google` | `hashicorp/google` | `~> 6.0` |
-| `vsphere` | `vsphere` | `vmware/vsphere` | `~> 2.10` |
+| `modules/aws` | `aws` | `hashicorp/aws` | `~> 5.0` |
+| `modules/azure` | `azurerm` | `hashicorp/azurerm` | `~> 4.0` |
+| `modules/gcp` | `google` | `hashicorp/google` | `~> 6.0` |
+| `modules/vsphere` | `vsphere` | `vmware/vsphere` | `~> 2.10` |
+| `modules/hyperv` | `hyperv` | `taliesins/hyperv` | `~> 1.2` |
 
-Only the provider for the platform you choose is loaded — the other
-three submodules are inert.
+Only the provider for the submodule you source is loaded — the others
+are never instantiated.

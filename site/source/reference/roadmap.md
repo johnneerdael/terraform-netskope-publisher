@@ -19,7 +19,9 @@ use today.
 
 ## Additional platforms
 
-- **Hyper-V** via `taliesins/hyperv` (cloud-init via NoCloud ISO).
+> Hyper-V shipped in v2.1.0 — see
+> [Hyper-V platform inputs](/terraform-netskope-publisher/admin/module/platforms/hyperv/).
+
 - **Nutanix AHV** via `nutanix/nutanix` (native `guest_customization.cloud_init`).
 - **KVM** via `dmacvicar/libvirt` (cloud-init via NoCloud ISO).
 - **OpenShift Virtualization (KubeVirt)** via the `kubernetes`

@@ -51,5 +51,6 @@ you source them.
 | `modules/azure` | Linux VM, NIC, optional PIP, optional NSG attach, marketplace agreement | `hashicorp/azurerm` |
 | `modules/gcp` | Compute Engine instance, metadata user-data | `hashicorp/google` |
 | `modules/vsphere` | VM cloned from template, guestinfo cloud-init | `vmware/vsphere` |
+| `modules/hyperv` | VM cloned from a master VHDX, NoCloud seed ISO built on the host via IMAPI2 | `taliesins/hyperv` |
 
 See also: [Registration flow](/terraform-netskope-publisher/admin/concepts/registration-flow/).

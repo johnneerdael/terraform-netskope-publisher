@@ -141,6 +141,48 @@ module "publisher" {
 }
 ```
 
+## Hyper-V
+
+`modules/hyperv` requires only a virtual switch (`vswitch_name`) and a
+host that can reach the public internet on TCP/443.
+
+| Switch type | Outbound 443 reachable? | Notes |
+|---|---|---|
+| **External (bridged to a NIC with internet)** | Yes — same as the host | Most common in labs and small deployments. |
+| **Internal (host + VMs only)** | No | The publisher cannot register. Add NAT on the host or use an External switch. |
+| **Private (VMs only)** | No | Same as Internal. |
+
+Minimal example:
+
+```hcl
+module "publisher" {
+  source = "github.com/johnneerdael/terraform-netskope-publisher//modules/hyperv?ref=v2.1.0"
+
+  tenant_url = var.netskope_tenant_url
+  api_token  = var.netskope_api_token
+
+  vswitch_name = "External vSwitch"
+
+  hyperv_winrm_config = {
+    host     = "hyperv01.lab.local"
+    user     = "Administrator"
+    password = var.hyperv_password
+  }
+}
+```
+
+Additional considerations:
+
+- **Host firewall** (Windows Defender Firewall): the host needs outbound
+  443 to `s3-us-west-2.amazonaws.com` for the VHDX download and the
+  Netskope tenant URL.
+- **WinRM** (5985 HTTP or 5986 HTTPS) must be reachable from wherever
+  you run Terraform.
+- **DNS on the VM**: by default it uses the vswitch's DHCP-assigned
+  DNS. If you use an internal-only DNS, make sure it can resolve public
+  Netskope hostnames or the publisher won't register.
+- **VLANs**: set `vlan_id` on the module to tag the publisher NIC.
+
 ## vSphere
 
 There's no module input for egress — the VM inherits its network's
