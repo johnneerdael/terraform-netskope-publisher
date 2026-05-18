@@ -85,3 +85,24 @@ module "gcp" {
   network_tags     = try(var.gcp.network_tags, [])
   service_account  = try(var.gcp.service_account, null)
 }
+
+module "vsphere" {
+  source = "./modules/vsphere"
+  count  = var.platform == "vsphere" ? 1 : 0
+
+  publisher_names = local.publisher_names
+  tenant_url      = var.netskope_tenant_url
+  api_token       = var.netskope_api_token
+  wizard_path     = var.wizard_path
+  tags            = var.tags
+
+  datacenter    = try(var.vsphere.datacenter, null)
+  cluster       = try(var.vsphere.cluster, null)
+  host          = try(var.vsphere.host, null)
+  datastore     = try(var.vsphere.datastore, null)
+  network_name  = try(var.vsphere.network_name, null)
+  template_name = try(var.vsphere.template_name, null)
+  folder        = try(var.vsphere.folder, null)
+  num_cpus      = try(var.vsphere.num_cpus, 2)
+  memory        = try(var.vsphere.memory, 4096)
+}
