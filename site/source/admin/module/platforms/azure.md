@@ -30,7 +30,12 @@ a VM-level precondition).
 ## Minimal example (custom image)
 
 ```hcl
-azure = {
+module "publisher" {
+  source = "github.com/johnneerdael/terraform-netskope-publisher//modules/azure?ref=v2.0.0"
+
+  tenant_url = var.netskope_tenant_url
+  api_token  = var.netskope_api_token
+
   resource_group_name  = "rg-npa"
   location             = "westeurope"
   subnet_id            = "/subscriptions/.../subnets/sn"
@@ -42,7 +47,12 @@ azure = {
 ## Minimal example (Marketplace)
 
 ```hcl
-azure = {
+module "publisher" {
+  source = "github.com/johnneerdael/terraform-netskope-publisher//modules/azure?ref=v2.0.0"
+
+  tenant_url = var.netskope_tenant_url
+  api_token  = var.netskope_api_token
+
   resource_group_name  = "rg-npa"
   location             = "westeurope"
   subnet_id            = "/subscriptions/.../subnets/sn"

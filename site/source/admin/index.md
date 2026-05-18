@@ -12,8 +12,8 @@ running `terraform-netskope-publisher` in production.
 - [Naming, replicas, and for_each](/terraform-netskope-publisher/admin/concepts/naming-replicas-foreach/)
 
 ## Module reference
-- [Root inputs](/terraform-netskope-publisher/admin/module/root-inputs/)
-- [Root outputs](/terraform-netskope-publisher/admin/module/root-outputs/)
+- [Common inputs](/terraform-netskope-publisher/admin/module/common-inputs/)
+- [Common outputs](/terraform-netskope-publisher/admin/module/common-outputs/)
 - Per-platform inputs:
   - [AWS](/terraform-netskope-publisher/admin/module/platforms/aws/)
   - [Azure](/terraform-netskope-publisher/admin/module/platforms/azure/)

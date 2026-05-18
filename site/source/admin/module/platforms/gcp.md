@@ -24,7 +24,12 @@ The `gcp = { ... }` object accepts:
 ## Minimal example
 
 ```hcl
-gcp = {
+module "publisher" {
+  source = "github.com/johnneerdael/terraform-netskope-publisher//modules/gcp?ref=v2.0.0"
+
+  tenant_url = var.netskope_tenant_url
+  api_token  = var.netskope_api_token
+
   project    = "my-gcp-project"
   zone       = "europe-west4-a"
   network    = "default"
@@ -36,7 +41,15 @@ gcp = {
 ## Full example
 
 ```hcl
-gcp = {
+module "publisher" {
+  source = "github.com/johnneerdael/terraform-netskope-publisher//modules/gcp?ref=v2.0.0"
+
+  name_prefix = "pub-gcp"
+  replicas    = 2
+
+  tenant_url = var.netskope_tenant_url
+  api_token  = var.netskope_api_token
+
   project          = "my-gcp-project"
   zone             = "europe-west4-a"
   network          = "vpc-prod"

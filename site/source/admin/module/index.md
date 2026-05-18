@@ -3,13 +3,25 @@ title: Module reference
 date: 2026-05-18
 ---
 
-Authoritative input/output reference for the root module and each platform
-submodule.
+Each platform is its own submodule. Source the one you need:
 
-- [Root inputs](/terraform-netskope-publisher/admin/module/root-inputs/)
-- [Root outputs](/terraform-netskope-publisher/admin/module/root-outputs/)
-- Per-platform inputs:
-  - [AWS](/terraform-netskope-publisher/admin/module/platforms/aws/)
-  - [Azure](/terraform-netskope-publisher/admin/module/platforms/azure/)
-  - [GCP](/terraform-netskope-publisher/admin/module/platforms/gcp/)
-  - [vSphere](/terraform-netskope-publisher/admin/module/platforms/vsphere/)
+```hcl
+module "publisher" {
+  source = "github.com/johnneerdael/terraform-netskope-publisher//modules/aws?ref=v2.0.0"
+  # …
+}
+```
+
+Substitute `aws` with `azure`, `gcp`, or `vsphere`.
+
+## Common interface (every submodule)
+
+- [Common inputs](/terraform-netskope-publisher/admin/module/common-inputs/)
+- [Common outputs](/terraform-netskope-publisher/admin/module/common-outputs/)
+
+## Platform-specific inputs
+
+- [AWS](/terraform-netskope-publisher/admin/module/platforms/aws/)
+- [Azure](/terraform-netskope-publisher/admin/module/platforms/azure/)
+- [GCP](/terraform-netskope-publisher/admin/module/platforms/gcp/)
+- [vSphere](/terraform-netskope-publisher/admin/module/platforms/vsphere/)

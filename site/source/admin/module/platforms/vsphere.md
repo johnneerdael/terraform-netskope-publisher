@@ -23,7 +23,12 @@ The `vsphere = { ... }` object accepts:
 ## Minimal example
 
 ```hcl
-vsphere = {
+module "publisher" {
+  source = "github.com/johnneerdael/terraform-netskope-publisher//modules/vsphere?ref=v2.0.0"
+
+  tenant_url = var.netskope_tenant_url
+  api_token  = var.netskope_api_token
+
   datacenter    = "dc1"
   cluster       = "cluster1"
   datastore     = "ds1"

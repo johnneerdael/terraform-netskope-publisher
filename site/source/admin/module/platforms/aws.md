@@ -32,17 +32,14 @@ By default the module finds the most recent AMI matching
 
 ```hcl
 module "publisher" {
-  source   = "github.com/johnneerdael/terraform-netskope-publisher?ref=v1.0.0"
-  platform = "aws"
+  source = "github.com/johnneerdael/terraform-netskope-publisher//modules/aws?ref=v2.0.0"
 
-  netskope_tenant_url = var.netskope_tenant_url
-  netskope_api_token  = var.netskope_api_token
+  tenant_url = var.netskope_tenant_url
+  api_token  = var.netskope_api_token
 
-  aws = {
-    subnet_id          = "subnet-..."
-    security_group_ids = ["sg-..."]
-    key_name           = "my-key"
-  }
+  subnet_id          = "subnet-..."
+  security_group_ids = ["sg-..."]
+  key_name           = "my-key"
 }
 ```
 
@@ -50,28 +47,26 @@ module "publisher" {
 
 ```hcl
 module "publisher" {
-  source      = "github.com/johnneerdael/terraform-netskope-publisher?ref=v1.0.0"
-  platform    = "aws"
+  source = "github.com/johnneerdael/terraform-netskope-publisher//modules/aws?ref=v2.0.0"
+
   name_prefix = "pub-eu"
   replicas    = 2
   tags        = { Owner = "platform-team", Env = "prod" }
 
-  netskope_tenant_url = var.netskope_tenant_url
-  netskope_api_token  = var.netskope_api_token
+  tenant_url = var.netskope_tenant_url
+  api_token  = var.netskope_api_token
 
-  aws = {
-    subnet_id                   = "subnet-..."
-    security_group_ids          = ["sg-..."]
-    key_name                    = "my-key"
-    instance_type               = "t3.large"
-    associate_public_ip_address = false
-    iam_instance_profile        = "ssm-managed"
-    ebs_optimized               = true
-    monitoring                  = true
-    metadata_options = {
-      http_endpoint = "enabled"
-      http_tokens   = "required"
-    }
+  subnet_id                   = "subnet-..."
+  security_group_ids          = ["sg-..."]
+  key_name                    = "my-key"
+  instance_type               = "t3.large"
+  associate_public_ip_address = false
+  iam_instance_profile        = "ssm-managed"
+  ebs_optimized               = true
+  monitoring                  = true
+  metadata_options = {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
   }
 }
 ```
@@ -82,8 +77,6 @@ module "publisher" {
 |---|---|---|
 | `aws_instance_ids` | list(string) | EC2 instance IDs in publisher-name order. |
 | `userdata_b64_by_name` | map(string) (sensitive) | Base64-encoded cloud-init per publisher. |
-
-Access via `module.publisher.aws[0].<output>`.
 
 ## Caveats
 
