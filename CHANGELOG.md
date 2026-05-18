@@ -6,6 +6,23 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.1.1] - 2026-05-18
+
+### Added
+- Module published to the Terraform Registry at
+  `johnneerdael/publisher/netskope`. Existing GitHub source URLs
+  continue to work.
+- Per-submodule `README.md` files (AWS, Azure, GCP, vSphere, Hyper-V)
+  that the Registry surfaces on each submodule page.
+- Restored documentation-only root module (`main.tf`, `variables.tf`,
+  `outputs.tf`) so the Registry has a valid landing page. The root
+  declares NO `module "x"` calls — v2's cross-provider-leak fix is
+  preserved.
+
+### Notes
+- Future Go-based `terraform-provider-netskope` plugin is on the
+  roadmap (see Reference → Roadmap on the docs site).
+
 ## [2.1.0] - 2026-05-18
 
 ### Added
