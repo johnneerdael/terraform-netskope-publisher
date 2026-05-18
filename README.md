@@ -5,7 +5,7 @@
 > reference for AWS / Azure / GCP / vSphere.
 
 Provision Netskope Private Access Publishers on **AWS**, **Azure**, **GCP**,
-or **vSphere** via the Netskope NPA API and cloud-init.
+**vSphere**, or **Hyper-V** via the Netskope NPA API and cloud-init.
 
 ## Quick start
 
@@ -25,8 +25,8 @@ module "publisher" {
 }
 ```
 
-For Azure / GCP / vSphere, source the matching submodule:
-`//modules/azure`, `//modules/gcp`, `//modules/vsphere`.
+For other platforms, source the matching submodule:
+`//modules/azure`, `//modules/gcp`, `//modules/vsphere`, `//modules/hyperv`.
 
 ## Why per-platform submodules
 

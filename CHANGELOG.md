@@ -6,6 +6,31 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-05-18
+
+### Added
+- New `modules/hyperv` submodule provisioning publishers on Hyper-V via
+  the `taliesins/hyperv` provider (only required when the submodule is
+  sourced).
+  - Master VHDX downloaded once per host from the Netskope public S3
+    URL (`https://s3-us-west-2.amazonaws.com/publisher.netskope.com/latest/NetskopePrivateAccessPublisher.vhdx`),
+    cached, and cloned per VM.
+  - NoCloud seed ISO built on the host via an IMAPI2 PowerShell helper
+    (no ADK / `oscdimg.exe` / external tools required).
+  - Same DX as the other submodules: `name_prefix`/`replicas`/`names`,
+    `tenant_url`/`api_token`, `publisher_names` output.
+- New output `metadata_raw` on `modules/cloudinit` (consumed by
+  `modules/hyperv` to embed meta-data in a PowerShell `EncodedCommand`).
+- `examples/hyperv-single/` runnable example.
+- Docs site: new Hyper-V platform page, connectivity section, provider
+  matrix entry, architecture row, roadmap update.
+
+### Notes
+- Plan-time test omitted for Hyper-V because `mock_provider` cannot
+  redirect to the `taliesins/hyperv` registry source. The submodule is
+  covered by `terraform validate` + the example, matching how Azure /
+  GCP / vSphere are handled.
+
 ## [2.0.0] - 2026-05-18
 
 ### Changed (BREAKING)
