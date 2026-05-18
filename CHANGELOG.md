@@ -6,6 +6,12 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-05-18
+
+### Added
+- vSphere submodule (`modules/vsphere`) cloning Netskope OVA template, cloud-init via `guestinfo`.
+- `examples/vsphere-single`.
+
 ## [0.3.0] - 2026-05-18
 
 ### Added
