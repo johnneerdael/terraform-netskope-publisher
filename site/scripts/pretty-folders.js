@@ -1,19 +1,24 @@
-// For each generated <name>.html (other than index.html) under source/,
-// also emit <name>/index.html. Makes /foo/ URLs work alongside /foo.html.
+// For each generated <name>.html (other than index.html), also emit
+// <name>/index.html. This aliases the final themed route; page.content only
+// contains the markdown body and produces unstyled pretty URLs.
 
 const path = require('path');
 
-hexo.extend.generator.register('pretty-folders', function (locals) {
-  const out = [];
-  locals.pages.forEach((page) => {
-    const p = page.path;
-    if (!p.endsWith('.html')) return;
-    if (p.endsWith('/index.html')) return;
-    const base = p.slice(0, -'.html'.length);
-    out.push({
-      path: base + '/index.html',
-      data: page.content,
+hexo.extend.filter.register('after_generate', function () {
+  const routes = hexo.route.routes;
+
+  hexo.route.list().forEach((routePath) => {
+    if (!routePath.endsWith('.html')) return;
+    if (path.basename(routePath) === 'index.html') return;
+
+    const parsed = path.posix.parse(routePath);
+    const aliasPath = path.posix.join(parsed.dir, parsed.name, 'index.html');
+    const original = routes[routePath];
+    if (!original) return;
+
+    hexo.route.set(aliasPath, {
+      data: original.data,
+      modified: original.modified,
     });
   });
-  return out;
 });
