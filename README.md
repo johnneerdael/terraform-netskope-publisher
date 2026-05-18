@@ -1,3 +1,5 @@
+[![Terraform Registry](https://img.shields.io/badge/terraform-registry-blueviolet)](https://registry.terraform.io/modules/johnneerdael/publisher/netskope)
+
 # terraform-netskope-publisher
 
 > 📖 **Full guides:** https://johnneerdael.github.io/terraform-netskope-publisher/
@@ -27,6 +29,23 @@ module "publisher" {
 
 For other platforms, source the matching submodule:
 `//modules/azure`, `//modules/gcp`, `//modules/vsphere`, `//modules/hyperv`.
+
+## Install via the Terraform Registry
+
+This module is published at
+[registry.terraform.io/modules/johnneerdael/publisher/netskope](https://registry.terraform.io/modules/johnneerdael/publisher/netskope).
+
+```hcl
+module "publisher" {
+  source  = "johnneerdael/publisher/netskope//modules/aws"
+  version = "~> 2.1"
+  # ...
+}
+```
+
+Substitute `//modules/aws` with `//modules/azure`, `//modules/gcp`,
+`//modules/vsphere`, or `//modules/hyperv` for other platforms. The
+GitHub source URL also keeps working.
 
 ## Why per-platform submodules
 

@@ -32,3 +32,13 @@ use today.
 - **In-site search** (e.g., `hexo-generator-search` + a lightweight UI).
 - **Dead-link checker** in the Pages workflow (e.g., `linkinator`).
 - **Versioned docs** if/when a breaking v2 of the module ships.
+
+## Future: Go-based Terraform Provider
+
+A standalone Go provider (`terraform-provider-netskope`) exposing
+resources like `netskope_publisher`,
+`netskope_publisher_registration_token`, `netskope_private_app`,
+`netskope_policy_rule`, etc. would replace the module's
+`http`-data-source registration flow with first-class Terraform
+resources and let users `terraform plan` diffs against Netskope tenant
+state. Multi-week effort; no ETA. Tracking interest via GitHub Issues.
