@@ -1,0 +1,7 @@
+netskope_tenant_url  = "https://tenant.goskope.com"
+netskope_api_token   = "..."
+resource_group_name  = "rg-npa"
+location             = "westeurope"
+subnet_id            = "/subscriptions/.../subnets/sn"
+admin_ssh_public_key = "ssh-rsa AAAA..."
+azure_image_id       = "/subscriptions/.../Microsoft.Compute/images/netskope-publisher"
