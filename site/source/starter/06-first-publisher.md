@@ -53,20 +53,15 @@ variable "netskope_api_token" {
 }
 
 module "publisher" {
-  source   = "github.com/johnneerdael/terraform-netskope-publisher?ref=v1.0.0"
-  platform = "aws"
+  source = "github.com/johnneerdael/terraform-netskope-publisher//modules/aws?ref=v1.1.1"
 
-  name_prefix = "my-first-publisher"
-  replicas    = 1
+  publisher_names = ["my-first-publisher"]
+  tenant_url      = var.netskope_tenant_url
+  api_token       = var.netskope_api_token
 
-  netskope_tenant_url = var.netskope_tenant_url
-  netskope_api_token  = var.netskope_api_token
-
-  aws = {
-    subnet_id          = "subnet-REPLACE-ME"
-    security_group_ids = ["sg-REPLACE-ME"]
-    key_name           = "npa-publisher-key"
-  }
+  subnet_id          = "subnet-REPLACE-ME"
+  security_group_ids = ["sg-REPLACE-ME"]
+  key_name           = "npa-publisher-key"
 }
 
 output "publishers" {

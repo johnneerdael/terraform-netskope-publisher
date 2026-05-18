@@ -24,7 +24,7 @@ run "creates_missing_and_reuses_existing" {
     target = data.http.create["pub-b"]
     values = {
       status_code   = 200
-      response_body = "{\"status\":\"success\",\"data\":{\"publisher_id\":202,\"publisher_name\":\"pub-b\"}}"
+      response_body = "{\"status\":\"success\",\"data\":{\"id\":202,\"name\":\"pub-b\"}}"
     }
   }
 
@@ -88,7 +88,7 @@ run "lists_empty_creates_both" {
     target = data.http.create["pub-a"]
     values = {
       status_code   = 200
-      response_body = "{\"status\":\"success\",\"data\":{\"publisher_id\":101,\"publisher_name\":\"pub-a\"}}"
+      response_body = "{\"status\":\"success\",\"data\":{\"id\":101,\"name\":\"pub-a\"}}"
     }
   }
 
@@ -96,7 +96,7 @@ run "lists_empty_creates_both" {
     target = data.http.create["pub-b"]
     values = {
       status_code   = 200
-      response_body = "{\"status\":\"success\",\"data\":{\"publisher_id\":202,\"publisher_name\":\"pub-b\"}}"
+      response_body = "{\"status\":\"success\",\"data\":{\"id\":202,\"name\":\"pub-b\"}}"
     }
   }
 

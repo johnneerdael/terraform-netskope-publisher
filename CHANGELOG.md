@@ -6,6 +6,19 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-05-18
+
+### Fixed
+- `modules/registration` was sending `{"publisher_name": "..."}` to
+  `POST /api/v2/infrastructure/publishers`, which the NPA API rejects
+  with `{"message":"'name'","status":"error"}`. The correct field name
+  is `name`. The create response uses `data.id`, not
+  `data.publisher_id`. Both fixed.
+- Starter Guide: sourced from `//modules/aws` directly to side-step the
+  cross-provider configuration leak (the root module pulls in all four
+  platform submodules, which forces `azurerm`/`google`/`vsphere`
+  providers to be configured even when only AWS is in use).
+
 ## [1.1.0] - 2026-05-18
 
 ### Added

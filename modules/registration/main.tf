@@ -43,7 +43,7 @@ data "http" "create" {
   url             = local.api_base
   method          = "POST"
   request_headers = local.base_headers
-  request_body    = jsonencode({ publisher_name = each.value })
+  request_body    = jsonencode({ name = each.value })
 
   lifecycle {
     postcondition {
@@ -56,7 +56,7 @@ data "http" "create" {
 locals {
   created_by_name = {
     for n, d in data.http.create :
-    n => tonumber(jsondecode(d.response_body).data.publisher_id)
+    n => tonumber(jsondecode(d.response_body).data.id)
   }
 
   publisher_ids = {
