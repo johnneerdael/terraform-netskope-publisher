@@ -31,8 +31,9 @@ variable "api_token" {
 }
 
 variable "wizard_path" {
-  type    = string
-  default = "/home/ubuntu/npa_publisher_wizard"
+  description = "Absolute path to npa_publisher_wizard on the VM. When null (default), derives from install_user as /home/<install_user>/npa_publisher_wizard."
+  type        = string
+  default     = null
 }
 
 variable "tags" {
@@ -58,8 +59,9 @@ variable "vm_size" {
 }
 
 variable "admin_username" {
-  type    = string
-  default = "ubuntu"
+  description = "Azure VM admin user. When null, defaults to install_user so the cloud-init user and the Azure admin are the same account."
+  type        = string
+  default     = null
 }
 
 variable "admin_ssh_public_key" {
@@ -104,4 +106,66 @@ variable "marketplace" {
 variable "accept_marketplace_terms" {
   type    = bool
   default = false
+}
+
+variable "bootstrap" {
+  description = "Run the Netskope generic bootstrap.sh during cloud-init on a vanilla Ubuntu image. Set false (default) when booting a pre-baked Netskope Publisher marketplace image."
+  type        = bool
+  default     = false
+}
+
+variable "bootstrap_url" {
+  description = "URL to the Netskope generic bootstrap script."
+  type        = string
+  default     = "https://s3-us-west-2.amazonaws.com/publisher.netskope.com/latest/generic/bootstrap.sh"
+}
+
+variable "nonat" {
+  description = "Enable Netskope No-NAT mode by creating ~/resources/.nonat. Default false on Azure."
+  type        = bool
+  default     = false
+}
+
+variable "install_user" {
+  description = "Linux user that owns the Publisher install. Replaces the image's default 'ubuntu' user when different."
+  type        = string
+  default     = "ubuntu"
+}
+
+variable "install_user_password" {
+  description = "Optional password for install_user. Null means key-only login."
+  type        = string
+  sensitive   = true
+  default     = null
+}
+
+variable "install_user_password_is_hash" {
+  description = "Set true when install_user_password is already a crypt(3) hash."
+  type        = bool
+  default     = false
+}
+
+variable "install_user_ssh_authorized_keys" {
+  description = "Extra public SSH keys installed in ~install_user/.ssh/authorized_keys (in addition to admin_ssh_public_key, which Azure injects natively)."
+  type        = list(string)
+  default     = []
+}
+
+variable "delete_default_user" {
+  description = "When true and install_user is not 'ubuntu', cloud-init deletes the image's default ubuntu user."
+  type        = bool
+  default     = true
+}
+
+variable "guest_network_interface" {
+  description = "Optional guest-OS primary interface override applied via netplan during cloud-init. Null leaves the image default (DHCP) untouched. Distinct from the Azure subnet / NIC configuration."
+  type = object({
+    name        = string
+    dhcp4       = optional(bool, false)
+    addresses   = optional(list(string), [])
+    gateway4    = optional(string)
+    nameservers = optional(list(string), [])
+    mtu         = optional(number)
+  })
+  default = null
 }

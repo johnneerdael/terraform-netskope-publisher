@@ -24,7 +24,13 @@ module "publisher" {
   location             = var.location
   subnet_id            = var.subnet_id
   admin_ssh_public_key = var.admin_ssh_public_key
-  image_id             = var.azure_image_id
+
+  # Boot the Canonical Ubuntu 22.04 LTS Minimal marketplace image and run the
+  # Netskope generic bootstrap.sh during cloud-init, then self-register with
+  # the token. To use a pre-baked Netskope Publisher image, set bootstrap = false
+  # and pass image_id or marketplace explicitly.
+  bootstrap = true
+  image_id  = var.azure_image_id
 }
 
 output "publishers" {

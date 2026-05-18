@@ -6,9 +6,18 @@ module "registration" {
 }
 
 module "cloudinit" {
-  source      = "../cloudinit"
-  publishers  = { for n, p in module.registration.publishers : n => p.registration_token }
-  wizard_path = var.wizard_path
+  source                           = "../cloudinit"
+  publishers                       = { for n, p in module.registration.publishers : n => p.registration_token }
+  wizard_path                      = var.wizard_path
+  bootstrap                        = var.bootstrap
+  bootstrap_url                    = var.bootstrap_url
+  nonat                            = var.nonat
+  install_user                     = var.install_user
+  install_user_password            = var.install_user_password
+  install_user_password_is_hash    = var.install_user_password_is_hash
+  install_user_ssh_authorized_keys = var.install_user_ssh_authorized_keys
+  delete_default_user              = var.delete_default_user
+  guest_network_interface          = var.guest_network_interface
 }
 
 resource "google_compute_instance" "publisher" {

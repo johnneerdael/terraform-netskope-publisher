@@ -1,5 +1,85 @@
 #cloud-config
 hostname: ${publisher_name}
 preserve_hostname: false
+
+system_info:
+  default_user:
+    name: ${install_user}
+
+users:
+  - name: ${install_user}
+    groups: [sudo]
+    sudo: "ALL=(ALL) NOPASSWD:ALL"
+    shell: /bin/bash
+    lock_passwd: ${install_user_password == null}
+%{ if length(install_user_ssh_authorized_keys) > 0 ~}
+    ssh_authorized_keys:
+%{ for key in install_user_ssh_authorized_keys ~}
+      - "${key}"
+%{ endfor ~}
+%{ endif ~}
+%{ if install_user_password != null ~}
+
+chpasswd:
+  expire: false
+  users:
+    - name: ${install_user}
+      password: "${install_user_password}"
+      type: ${install_user_password_is_hash ? "hash" : "text"}
+ssh_pwauth: true
+%{ endif ~}
+%{ if guest_network_interface != null ~}
+
+write_files:
+  - path: /etc/netplan/60-cloudinit-override.yaml
+    owner: root:root
+    permissions: "0600"
+    content: |
+      network:
+        version: 2
+        ethernets:
+          ${guest_network_interface.name}:
+            dhcp4: ${guest_network_interface.dhcp4}
+%{ if length(guest_network_interface.addresses) > 0 ~}
+            addresses:
+%{ for a in guest_network_interface.addresses ~}
+              - ${a}
+%{ endfor ~}
+%{ endif ~}
+%{ if guest_network_interface.gateway4 != null ~}
+            gateway4: ${guest_network_interface.gateway4}
+%{ endif ~}
+%{ if length(guest_network_interface.nameservers) > 0 ~}
+            nameservers:
+              addresses:
+%{ for ns in guest_network_interface.nameservers ~}
+                - ${ns}
+%{ endfor ~}
+%{ endif ~}
+%{ if guest_network_interface.mtu != null ~}
+            mtu: ${guest_network_interface.mtu}
+%{ endif ~}
+%{ endif ~}
+
 runcmd:
-  - [ ${wizard_path}, -token, "${registration_token}" ]
+%{ if guest_network_interface != null ~}
+  - chmod 0600 /etc/netplan/60-cloudinit-override.yaml
+  - netplan apply
+%{ endif ~}
+%{ if delete_default_user && install_user != "ubuntu" ~}
+  - pkill -KILL -u ubuntu || true
+  - userdel -r ubuntu 2>/dev/null || true
+%{ endif ~}
+%{ if bootstrap || nonat ~}
+  - chmod 1777 /tmp
+%{ endif ~}
+%{ if nonat ~}
+  - install -d -o ${install_user} -g ${install_user} -m 0755 /home/${install_user}/resources
+  - install -o ${install_user} -g ${install_user} -m 0644 /dev/null /home/${install_user}/resources/.nonat
+%{ endif ~}
+%{ if bootstrap ~}
+  - su - ${install_user} -c 'curl -fsSL ${bootstrap_url} | sudo bash'
+  - su - ${install_user} -c 'sudo ${wizard_path} -token "${registration_token}"'
+%{ else ~}
+  - su - ${install_user} -c 'sudo ${wizard_path} -token "${registration_token}"'
+%{ endif ~}

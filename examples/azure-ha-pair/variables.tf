@@ -25,5 +25,7 @@ variable "admin_ssh_public_key" {
 }
 
 variable "azure_image_id" {
-  type = string
+  description = "Optional pre-baked image resource ID. Leave null (default) to boot the Canonical Ubuntu 22.04 LTS Minimal marketplace image via bootstrap mode."
+  type        = string
+  default     = null
 }

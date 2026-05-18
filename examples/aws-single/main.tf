@@ -25,6 +25,12 @@ module "publisher" {
   security_group_ids = [var.security_group_id]
   key_name           = var.key_name
 
+  # Boot a stock Canonical Ubuntu 22.04 LTS Minimal AMI and run the Netskope
+  # generic bootstrap.sh during cloud-init, then self-register with the token.
+  # Set bootstrap = false (and provide ami_id) to use a pre-baked Netskope
+  # Publisher AMI instead.
+  bootstrap = true
+
   # Public subnet assumed. Drop this line if the subnet has NAT instead.
   associate_public_ip_address = true
 }

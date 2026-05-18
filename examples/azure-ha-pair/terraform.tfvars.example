@@ -4,4 +4,6 @@ resource_group_name  = "rg-npa"
 location             = "westeurope"
 subnet_id            = "/subscriptions/.../subnets/sn"
 admin_ssh_public_key = "ssh-rsa AAAA..."
-azure_image_id       = "/subscriptions/.../Microsoft.Compute/images/netskope-publisher"
+# azure_image_id     = "/subscriptions/.../Microsoft.Compute/images/netskope-publisher"
+# Leave azure_image_id unset to boot the Canonical Ubuntu 22.04 LTS Minimal
+# marketplace image and install the Publisher via bootstrap.sh in cloud-init.

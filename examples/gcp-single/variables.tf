@@ -27,5 +27,7 @@ variable "subnetwork" {
 }
 
 variable "image" {
-  type = string
+  description = "Compute image self-link or family. Defaults to the public Ubuntu 22.04 LTS image; cloud-init runs the Netskope bootstrap script on first boot."
+  type        = string
+  default     = "projects/ubuntu-os-cloud/global/images/family/ubuntu-minimal-2204-lts"
 }
