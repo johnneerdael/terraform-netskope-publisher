@@ -6,6 +6,12 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-05-18
+
+### Changed
+- First blessed release with AWS, Azure, GCP, and vSphere all green.
+- README rewritten to cover full multi-platform surface.
+
 ## [0.4.0] - 2026-05-18
 
 ### Added
