@@ -5,16 +5,20 @@ date: 2026-05-18
 
 ## How names are derived
 
+Each platform submodule contains:
+
 ```hcl
 local.publisher_names = var.names != null
   ? var.names
   : [for i in range(var.replicas) : format("%s-%d", var.name_prefix, i + 1)]
 ```
 
-- If you set `var.names = ["pub-a", "pub-b"]`, the module uses those
-  names literally and ignores `replicas`.
-- Otherwise it derives `<name_prefix>-1`, `<name_prefix>-2`, … from
-  `replicas`.
+- Set `var.names = ["pub-a", "pub-b"]` for explicit names; `replicas`
+  is ignored.
+- Otherwise the module derives `<name_prefix>-1`, `<name_prefix>-2`, …
+  from `var.replicas`.
+
+The derived list is exposed via the `publisher_names` output.
 
 ## Why `for_each`, not `count`
 
@@ -22,22 +26,19 @@ Every downstream resource iterates `for_each = toset(local.publisher_names)`.
 Removing one name from the middle of the list does not churn the others
 — Terraform identifies resources by name, not by index.
 
-If you used `count`, removing the second entry from a list of three
-would re-create the third (because its index shifts from 2 to 1).
+`count`-based iteration would re-create resources whose index shifts;
 `for_each` avoids that.
 
 ## Naming a single publisher
 
-For one-off setups, the default works:
-
 ```hcl
 module "publisher" {
-  source      = "github.com/johnneerdael/terraform-netskope-publisher?ref=v1.0.0"
-  platform    = "aws"
+  source      = "github.com/johnneerdael/terraform-netskope-publisher//modules/aws?ref=v2.0.0"
   name_prefix = "main-publisher"
   # replicas defaults to 1 → one publisher named "main-publisher-1"
+  # …
 }
 ```
 
-If you want exactly `main-publisher` (no `-1` suffix), use
+For exactly `main-publisher` (no `-1` suffix), use
 `names = ["main-publisher"]`.

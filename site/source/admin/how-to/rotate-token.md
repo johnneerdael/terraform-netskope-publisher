@@ -18,8 +18,8 @@ Taint the registration data source so Terraform re-issues a token on the
 next apply, then re-run cloud-init by replacing the VM:
 
 ```bash
-terraform taint 'module.publisher.module.aws[0].module.registration.data.http.token["pub-eu-1"]'
-terraform taint 'module.publisher.module.aws[0].aws_instance.publisher["pub-eu-1"]'
+terraform taint 'module.publisher.module.registration.data.http.token["pub-eu-1"]'
+terraform taint 'module.publisher.aws_instance.publisher["pub-eu-1"]'
 terraform apply
 ```
 

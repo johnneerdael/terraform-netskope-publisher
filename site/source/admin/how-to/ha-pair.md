@@ -14,19 +14,17 @@ Set `replicas = 2` (or pass explicit `names`):
 
 ```hcl
 module "publisher" {
-  source      = "github.com/johnneerdael/terraform-netskope-publisher?ref=v1.0.0"
-  platform    = "aws"
+  source = "github.com/johnneerdael/terraform-netskope-publisher//modules/aws?ref=v2.0.0"
+
   name_prefix = "pub-eu"
   replicas    = 2
 
-  netskope_tenant_url = var.netskope_tenant_url
-  netskope_api_token  = var.netskope_api_token
+  tenant_url = var.netskope_tenant_url
+  api_token  = var.netskope_api_token
 
-  aws = {
-    subnet_id          = var.subnet_id
-    security_group_ids = [var.security_group_id]
-    key_name           = var.key_name
-  }
+  subnet_id          = var.subnet_id
+  security_group_ids = [var.security_group_id]
+  key_name           = var.key_name
 }
 ```
 

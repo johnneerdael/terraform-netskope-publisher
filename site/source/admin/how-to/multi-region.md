@@ -24,37 +24,31 @@ provider "aws" {
 }
 
 module "publisher_eu" {
-  source   = "github.com/johnneerdael/terraform-netskope-publisher?ref=v1.0.0"
-  platform = "aws"
+  source    = "github.com/johnneerdael/terraform-netskope-publisher//modules/aws?ref=v2.0.0"
   providers = { aws = aws.eu }
 
-  name_prefix         = "pub-eu"
-  replicas            = 2
-  netskope_tenant_url = var.netskope_tenant_url
-  netskope_api_token  = var.netskope_api_token
+  name_prefix = "pub-eu"
+  replicas    = 2
+  tenant_url  = var.netskope_tenant_url
+  api_token   = var.netskope_api_token
 
-  aws = {
-    subnet_id          = var.eu_subnet_id
-    security_group_ids = [var.eu_sg_id]
-    key_name           = var.eu_key_name
-  }
+  subnet_id          = var.eu_subnet_id
+  security_group_ids = [var.eu_sg_id]
+  key_name           = var.eu_key_name
 }
 
 module "publisher_us" {
-  source   = "github.com/johnneerdael/terraform-netskope-publisher?ref=v1.0.0"
-  platform = "aws"
+  source    = "github.com/johnneerdael/terraform-netskope-publisher//modules/aws?ref=v2.0.0"
   providers = { aws = aws.us }
 
-  name_prefix         = "pub-us"
-  replicas            = 2
-  netskope_tenant_url = var.netskope_tenant_url
-  netskope_api_token  = var.netskope_api_token
+  name_prefix = "pub-us"
+  replicas    = 2
+  tenant_url  = var.netskope_tenant_url
+  api_token   = var.netskope_api_token
 
-  aws = {
-    subnet_id          = var.us_subnet_id
-    security_group_ids = [var.us_sg_id]
-    key_name           = var.us_key_name
-  }
+  subnet_id          = var.us_subnet_id
+  security_group_ids = [var.us_sg_id]
+  key_name           = var.us_key_name
 }
 ```
 

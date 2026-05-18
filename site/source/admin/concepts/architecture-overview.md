@@ -5,26 +5,41 @@ date: 2026-05-18
 
 ## The big picture
 
-One root module routes on `var.platform` to one of four platform
-submodules (`modules/aws`, `modules/azure`, `modules/gcp`,
-`modules/vsphere`). Each platform submodule calls two shared submodules:
+Each cloud platform is its own Terraform submodule
+(`modules/aws`, `modules/azure`, `modules/gcp`, `modules/vsphere`).
+You source the one you need:
+
+```hcl
+module "publisher" {
+  source = "github.com/johnneerdael/terraform-netskope-publisher//modules/aws?ref=v2.0.0"
+  # …
+}
+```
+
+Each platform submodule calls two shared submodules:
 
 - `modules/registration` — talks to the Netskope NPA API via the `http`
   provider (list → create-if-missing → token).
 - `modules/cloudinit` — renders a cloud-init user-data document
   containing `/home/ubuntu/npa_publisher_wizard -token <token>`.
 
-The platform submodule then provisions one VM per publisher name with
-`for_each`, attaching the rendered user-data via the cloud-specific
+The platform submodule then provisions one VM per derived publisher name
+with `for_each`, attaching the rendered user-data via the cloud-specific
 mechanism (`user_data_base64` / `custom_data` / `metadata.user-data` /
 `extra_config.guestinfo.userdata`).
 
 ## Provider isolation
 
 Each platform submodule declares only its own provider in
-`required_providers`. A consumer using `platform = "aws"` never
-instantiates the `azurerm`, `google`, or `vsphere` providers because
-those declarations live inside the unused submodules.
+`required_providers`. A consumer sourcing `//modules/aws` never
+instantiates the `azurerm`, `google`, or `vsphere` providers — those
+declarations live inside the unused submodules and only resolve when
+you source them.
+
+> v1 had a multi-platform root module that routed on `var.platform`,
+> but Terraform requires every declared submodule's provider to be
+> configurable, so v1 forced consumers to configure all four. v2 removes
+> that root module.
 
 ## What lives where
 

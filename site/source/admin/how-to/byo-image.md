@@ -23,7 +23,12 @@ Each platform exposes an image override input:
 Example (AWS):
 
 ```hcl
-aws = {
+module "publisher" {
+  source = "github.com/johnneerdael/terraform-netskope-publisher//modules/aws?ref=v2.0.0"
+
+  tenant_url = var.netskope_tenant_url
+  api_token  = var.netskope_api_token
+
   subnet_id          = var.subnet_id
   security_group_ids = [var.security_group_id]
   key_name           = var.key_name

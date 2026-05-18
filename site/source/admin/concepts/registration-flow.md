@@ -5,7 +5,7 @@ date: 2026-05-18
 
 ## End-to-end sequence
 
-For each name in `var.publisher_names` (one per replica):
+For each derived publisher name (see [Naming, replicas, and for_each](/terraform-netskope-publisher/admin/concepts/naming-replicas-foreach/)):
 
 1. **List** — `GET {tenant_url}/api/v2/infrastructure/publishers` with
    header `Netskope-Api-Token: <api_token>`. The response is decoded and
