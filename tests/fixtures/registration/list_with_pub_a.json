@@ -1,0 +1,8 @@
+{
+  "status": "success",
+  "data": {
+    "publishers": [
+      { "publisher_id": 101, "publisher_name": "pub-a" }
+    ]
+  }
+}
