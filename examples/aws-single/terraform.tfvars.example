@@ -1,0 +1,6 @@
+netskope_tenant_url = "https://tenant.goskope.com"
+netskope_api_token  = "..."
+aws_region          = "eu-west-1"
+subnet_id           = "subnet-..."
+security_group_id   = "sg-..."
+key_name            = "my-key"
