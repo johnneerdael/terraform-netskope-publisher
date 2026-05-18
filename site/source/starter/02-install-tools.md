@@ -8,7 +8,7 @@ date: 2026-05-18
 You need three CLI tools: **terraform**, **awscli**, and **git**.
 
 {% tabs install-tools %}
-<!-- tab macOS -->
+{% tab macOS %}
 
 Install Homebrew if you don't have it:
 
@@ -30,8 +30,8 @@ aws --version        # >= 2.x
 git --version
 ```
 
-<!-- endtab -->
-<!-- tab Windows -->
+{% endtab %}
+{% tab Windows %}
 
 > Requires PowerShell 7 or Windows Terminal. The default `cmd.exe` works
 > too but copy-paste of multi-line blocks is friendlier in PowerShell.
@@ -52,7 +52,7 @@ aws --version        # >= 2.x
 git --version
 ```
 
-<!-- endtab -->
+{% endtab %}
 {% endtabs %}
 
 If any command says "not found", close and reopen your terminal. Still
