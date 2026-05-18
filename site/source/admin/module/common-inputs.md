@@ -26,7 +26,7 @@ are documented on the per-platform pages
 | `names` | list(string) | `null` | Explicit publisher names. When set, overrides `name_prefix` + `replicas`. |
 | `replicas` | number | `1` | Number of publishers to derive from `name_prefix`. |
 | `tags` | map(string) | `{}` | Tags / labels applied per platform. |
-| `wizard_path` | string | `"/home/ubuntu/npa_publisher_wizard"` | Absolute path to the wizard binary on the VM. |
+| `wizard_path` | string | `"/home/ubuntu/npa_publisher_wizard"` | Absolute path to the wizard binary on the VM. Not used by `modules/kubernetes` (the chart's container image already has the wizard at its canonical location). |
 
 ## Naming derivation
 
