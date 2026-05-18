@@ -183,6 +183,36 @@ Additional considerations:
   Netskope hostnames or the publisher won't register.
 - **VLANs**: set `vlan_id` on the module to tag the publisher NIC.
 
+## Kubernetes
+
+`modules/kubernetes` installs the publisher chart into whatever cluster
+the caller's `helm` + `kubernetes` providers point at. The Pods need
+outbound TCP/443 to:
+
+- Your Netskope tenant URL (registration in api mode; ongoing publisher↔gateway traffic always).
+- Docker Hub at `index.docker.io` for the
+  `netskopeprivateaccess/publisher_u22` image — override
+  `image_repository` to point at a private mirror if Docker Hub is
+  unreachable.
+
+### NetworkPolicies
+
+If the namespace has a default-deny egress NetworkPolicy, add an
+explicit allow for TCP/443 from the publisher Pods (selectors per the
+chart's standard labels).
+
+### Egress through an HTTP proxy
+
+The chart accepts `HTTPS_PROXY` / `HTTP_PROXY` / `NO_PROXY` env vars on
+the publisher container via the `extraEnv` values key. Wire those into
+`chart_values` if your cluster's egress is proxied.
+
+### Chart pull
+
+`oci://ghcr.io/johnneerdael/charts/kubernetes-netskope-publisher` is
+publicly readable. Air-gapped clusters need to mirror the OCI artifact
+and set `chart_repository` to point at the mirror.
+
 ## vSphere
 
 There's no module input for egress — the VM inherits its network's

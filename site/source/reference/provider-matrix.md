@@ -30,6 +30,7 @@ Older Terraform will still run the module itself.
 | `modules/gcp` | `google` | `hashicorp/google` | `~> 6.0` |
 | `modules/vsphere` | `vsphere` | `vmware/vsphere` | `~> 2.10` |
 | `modules/hyperv` | `hyperv` | `taliesins/hyperv` | `~> 1.2` |
+| `modules/kubernetes` | `helm`, `kubernetes` | `hashicorp/helm`, `hashicorp/kubernetes` | `~> 2.13`, `~> 2.30` |
 
 Only the provider for the submodule you source is loaded — the others
 are never instantiated.

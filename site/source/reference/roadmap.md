@@ -21,11 +21,18 @@ use today.
 
 > Hyper-V shipped in v2.1.0 — see
 > [Hyper-V platform inputs](/terraform-netskope-publisher/admin/module/platforms/hyperv/).
+>
+> Kubernetes shipped in v2.2.0 (covers vanilla K8s, EKS, AKS, GKE,
+> OpenShift via the K8s API) — see
+> [Kubernetes platform inputs](/terraform-netskope-publisher/admin/module/platforms/kubernetes/).
 
 - **Nutanix AHV** via `nutanix/nutanix` (native `guest_customization.cloud_init`).
 - **KVM** via `dmacvicar/libvirt` (cloud-init via NoCloud ISO).
-- **OpenShift Virtualization (KubeVirt)** via the `kubernetes`
-  provider's `kubevirt.io_v1_VirtualMachine` CRD.
+- **Per-platform Kubernetes wrappers** (`modules/eks-publisher`,
+  `modules/aks-publisher`, `modules/gke-publisher`,
+  `modules/openshift-publisher`) — thin shims that do cluster lookup
+  via the platform's provider and then call `modules/kubernetes`.
+  Possible v3 work driven by user demand.
 
 ## Site
 
