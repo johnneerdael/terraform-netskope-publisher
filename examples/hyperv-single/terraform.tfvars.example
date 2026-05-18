@@ -1,0 +1,6 @@
+netskope_tenant_url = "https://tenant.goskope.com"
+netskope_api_token  = "..."
+hyperv_host         = "hyperv01.lab.local"
+hyperv_user         = "Administrator"
+hyperv_password     = "..."
+vswitch_name        = "External vSwitch"
