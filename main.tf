@@ -40,3 +40,27 @@ module "aws" {
   monitoring                  = try(var.aws.monitoring, true)
   metadata_options            = try(var.aws.metadata_options, {})
 }
+
+module "azure" {
+  source = "./modules/azure"
+  count  = var.platform == "azure" ? 1 : 0
+
+  publisher_names = local.publisher_names
+  tenant_url      = var.netskope_tenant_url
+  api_token       = var.netskope_api_token
+  wizard_path     = var.wizard_path
+  tags            = var.tags
+
+  resource_group_name       = try(var.azure.resource_group_name, null)
+  location                  = try(var.azure.location, null)
+  subnet_id                 = try(var.azure.subnet_id, null)
+  vm_size                   = try(var.azure.vm_size, "Standard_D2s_v5")
+  admin_username            = try(var.azure.admin_username, "ubuntu")
+  admin_ssh_public_key      = try(var.azure.admin_ssh_public_key, null)
+  network_security_group_id = try(var.azure.network_security_group_id, null)
+  assign_public_ip          = try(var.azure.assign_public_ip, false)
+  os_disk                   = try(var.azure.os_disk, {})
+  image_id                  = try(var.azure.image_id, null)
+  marketplace               = try(var.azure.marketplace, null)
+  accept_marketplace_terms  = try(var.azure.accept_marketplace_terms, false)
+}
