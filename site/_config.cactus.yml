@@ -8,6 +8,17 @@ logo:
   gravatar: false
   grayout: false
 
+favicon:
+  desktop:
+    url: /images/netskope-favicon.ico
+    gravatar: false
+  android:
+    url: /images/netskope-favicon-192x192.png
+    gravatar: false
+  apple:
+    url: /images/netskope-apple-touch-icon.png
+    gravatar: false
+
 nav:
   home:      /
   starter:   /starter/
