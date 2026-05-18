@@ -1,7 +1,7 @@
 output "publishers" {
   sensitive = true
   value = {
-    for n in var.publisher_names : n => {
+    for n in local.publisher_names : n => {
       publisher_id       = module.registration.publishers[n].publisher_id
       registration_token = module.registration.publishers[n].registration_token
       vm_id              = azurerm_linux_virtual_machine.publisher[n].id
@@ -12,10 +12,15 @@ output "publishers" {
 }
 
 output "vm_ids" {
-  value = [for n in var.publisher_names : azurerm_linux_virtual_machine.publisher[n].id]
+  value = [for n in local.publisher_names : azurerm_linux_virtual_machine.publisher[n].id]
 }
 
 output "custom_data_by_name" {
-  value     = { for n in var.publisher_names : n => azurerm_linux_virtual_machine.publisher[n].custom_data }
+  value     = { for n in local.publisher_names : n => azurerm_linux_virtual_machine.publisher[n].custom_data }
   sensitive = true
+}
+
+output "publisher_names" {
+  description = "Derived publisher names (useful when name_prefix+replicas was used)."
+  value       = local.publisher_names
 }

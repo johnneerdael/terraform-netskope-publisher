@@ -2,7 +2,7 @@ module "registration" {
   source          = "../registration"
   tenant_url      = var.tenant_url
   api_token       = var.api_token
-  publisher_names = var.publisher_names
+  publisher_names = local.publisher_names
 }
 
 module "cloudinit" {
@@ -19,7 +19,7 @@ resource "azurerm_marketplace_agreement" "publisher" {
 }
 
 resource "azurerm_public_ip" "publisher" {
-  for_each = var.assign_public_ip ? toset(var.publisher_names) : []
+  for_each = var.assign_public_ip ? toset(local.publisher_names) : []
 
   name                = "${each.key}-pip"
   resource_group_name = var.resource_group_name
@@ -30,7 +30,7 @@ resource "azurerm_public_ip" "publisher" {
 }
 
 resource "azurerm_network_interface" "publisher" {
-  for_each = toset(var.publisher_names)
+  for_each = toset(local.publisher_names)
 
   name                = "${each.key}-nic"
   resource_group_name = var.resource_group_name
@@ -46,14 +46,14 @@ resource "azurerm_network_interface" "publisher" {
 }
 
 resource "azurerm_network_interface_security_group_association" "publisher" {
-  for_each = var.network_security_group_id == null ? toset([]) : toset(var.publisher_names)
+  for_each = var.network_security_group_id == null ? toset([]) : toset(local.publisher_names)
 
   network_interface_id      = azurerm_network_interface.publisher[each.key].id
   network_security_group_id = var.network_security_group_id
 }
 
 resource "azurerm_linux_virtual_machine" "publisher" {
-  for_each = toset(var.publisher_names)
+  for_each = toset(local.publisher_names)
 
   name                  = each.key
   resource_group_name   = var.resource_group_name
