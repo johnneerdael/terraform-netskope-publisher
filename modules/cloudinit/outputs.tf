@@ -14,3 +14,8 @@ output "metadata_b64" {
   description = "Map of publisher name => base64-encoded NoCloud meta-data."
   value       = nonsensitive({ for n, m in local.metadata : n => base64encode(m) })
 }
+
+output "metadata_raw" {
+  description = "Map of publisher name => rendered NoCloud meta-data (string)."
+  value       = nonsensitive(local.metadata)
+}
