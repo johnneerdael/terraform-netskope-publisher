@@ -6,6 +6,12 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-05-18
+
+### Added
+- GCP submodule (`modules/gcp`) provisioning Compute Engine publishers via `metadata["user-data"]`.
+- `examples/gcp-single`.
+
 ## [0.2.0] - 2026-05-18
 
 ### Added

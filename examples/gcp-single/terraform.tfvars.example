@@ -1,0 +1,7 @@
+netskope_tenant_url = "https://tenant.goskope.com"
+netskope_api_token  = "..."
+project             = "my-gcp-project"
+zone                = "europe-west4-a"
+network             = "default"
+subnetwork          = "default"
+image               = "projects/my-gcp-project/global/images/netskope-publisher"
