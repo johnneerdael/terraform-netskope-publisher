@@ -2,6 +2,7 @@ locals {
   publishers_by_platform = {
     aws   = try(module.aws[0].publishers, {})
     azure = try(module.azure[0].publishers, {})
+    gcp   = try(module.gcp[0].publishers, {})
   }
 }
 

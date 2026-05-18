@@ -64,3 +64,24 @@ module "azure" {
   marketplace               = try(var.azure.marketplace, null)
   accept_marketplace_terms  = try(var.azure.accept_marketplace_terms, false)
 }
+
+module "gcp" {
+  source = "./modules/gcp"
+  count  = var.platform == "gcp" ? 1 : 0
+
+  publisher_names = local.publisher_names
+  tenant_url      = var.netskope_tenant_url
+  api_token       = var.netskope_api_token
+  wizard_path     = var.wizard_path
+  tags            = var.tags
+
+  project          = try(var.gcp.project, null)
+  zone             = try(var.gcp.zone, null)
+  network          = try(var.gcp.network, "default")
+  subnetwork       = try(var.gcp.subnetwork, "default")
+  machine_type     = try(var.gcp.machine_type, "e2-medium")
+  image            = try(var.gcp.image, null)
+  assign_public_ip = try(var.gcp.assign_public_ip, false)
+  network_tags     = try(var.gcp.network_tags, [])
+  service_account  = try(var.gcp.service_account, null)
+}
