@@ -43,8 +43,14 @@ provider "aws" {
   region = "eu-west-1"
 }
 
-variable "netskope_tenant_url" { type = string }
-variable "netskope_api_token"  { type = string, sensitive = true }
+variable "netskope_tenant_url" {
+  type = string
+}
+
+variable "netskope_api_token" {
+  type      = string
+  sensitive = true
+}
 
 module "publisher" {
   source   = "github.com/johnneerdael/terraform-netskope-publisher?ref=v1.0.0"
