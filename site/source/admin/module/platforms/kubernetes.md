@@ -48,9 +48,45 @@ module "publisher" {
 }
 ```
 
-## Full example (api mode, HPA, StatefulSet)
+## Full main.tf example — API mode, HPA, StatefulSet
 
 ```hcl
+terraform {
+  required_version = ">= 1.7"
+
+  required_providers {
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 2.30"
+    }
+    helm = {
+      source  = "hashicorp/helm"
+      version = "~> 2.13"
+    }
+  }
+}
+
+provider "kubernetes" {
+  config_path    = pathexpand("~/.kube/config")
+  config_context = "prod"
+}
+
+provider "helm" {
+  kubernetes {
+    config_path    = pathexpand("~/.kube/config")
+    config_context = "prod"
+  }
+}
+
+variable "netskope_tenant_url" {
+  type = string
+}
+
+variable "netskope_api_token" {
+  type      = string
+  sensitive = true
+}
+
 module "publisher" {
   source  = "johnneerdael/publisher/netskope//modules/kubernetes"
   version = "~> 2.2"
@@ -68,8 +104,40 @@ module "publisher" {
   hpa_enabled      = true
   hpa_min_replicas = 3
   hpa_max_replicas = 10
+
+  image_repository = "registry.example.com/netskope/publisher_u22"
+  image_tag        = "latest"
+
+  chart_values = {
+    podAnnotations = {
+      "prometheus.io/scrape" = "true"
+      "prometheus.io/port"   = "9090"
+    }
+    resources = {
+      requests = {
+        cpu    = "500m"
+        memory = "1Gi"
+      }
+      limits = {
+        cpu    = "2"
+        memory = "4Gi"
+      }
+    }
+  }
+}
+
+output "helm_release_names" {
+  value = module.publisher.helm_release_names
+}
+
+output "publisher_names" {
+  value = module.publisher.publisher_names
 }
 ```
+
+Kubernetes does not use VM bootstrap, SSH users, private keys, or
+passwords. The equivalent customization points are Helm values, image
+overrides, workload type, and enrollment mode.
 
 ## Platform-specific outputs
 

@@ -1,6 +1,6 @@
 ---
 title: Hyper-V platform inputs
-date: 2026-05-18
+date: 2026-05-19
 toc: true
 ---
 
@@ -46,11 +46,52 @@ module "publisher" {
 }
 ```
 
-## Full example
+## Full main.tf example
+
+Hyper-V boots the Netskope VHDX and delivers only registration cloud-init
+through a NoCloud ISO. This submodule does not expose the AWS/Azure/GCP
+bootstrap-only `install_user`, `install_user_password`, or
+`install_user_ssh_authorized_keys` inputs.
 
 ```hcl
+terraform {
+  required_version = ">= 1.7"
+
+  required_providers {
+    hyperv = {
+      source  = "taliesins/hyperv"
+      version = "~> 1.2"
+    }
+  }
+}
+
+provider "hyperv" {
+  host     = "hyperv01.lab.local"
+  user     = "DOMAIN\\svc-terraform"
+  password = var.hyperv_password
+  port     = 5986
+  https    = true
+  insecure = false
+  use_ntlm = true
+}
+
+variable "hyperv_password" {
+  type      = string
+  sensitive = true
+}
+
+variable "netskope_tenant_url" {
+  type = string
+}
+
+variable "netskope_api_token" {
+  type      = string
+  sensitive = true
+}
+
 module "publisher" {
-  source = "github.com/johnneerdael/terraform-netskope-publisher//modules/hyperv?ref=v2.1.0"
+  source  = "johnneerdael/publisher/netskope//modules/hyperv"
+  version = "~> 2.3"
 
   name_prefix = "pub-hv"
   replicas    = 2
@@ -74,6 +115,17 @@ module "publisher" {
     insecure = false
     use_ntlm = true
   }
+}
+
+output "publisher_names" {
+  value = module.publisher.publisher_names
+}
+
+output "publisher_vm_ids" {
+  value = {
+    for name, publisher in module.publisher.publishers : name => publisher.vm_id
+  }
+  sensitive = true
 }
 ```
 

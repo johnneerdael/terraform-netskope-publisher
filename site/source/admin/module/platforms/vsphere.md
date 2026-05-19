@@ -1,6 +1,6 @@
 ---
 title: vSphere platform inputs
-date: 2026-05-18
+date: 2026-05-19
 toc: true
 ---
 
@@ -39,6 +39,89 @@ module "publisher" {
   datastore     = "ds1"
   network_name  = "vm-net"
   template_name = "netskope-publisher-template"
+}
+```
+
+## Full main.tf example
+
+vSphere uses a pre-baked Netskope Publisher template. This submodule does
+not expose the AWS/Azure/GCP bootstrap-only `install_user`,
+`install_user_password`, or `install_user_ssh_authorized_keys` inputs;
+customize the guest account in the template before cloning if you need a
+different local login.
+
+```hcl
+terraform {
+  required_version = ">= 1.7"
+
+  required_providers {
+    vsphere = {
+      source  = "vmware/vsphere"
+      version = "~> 2.10"
+    }
+  }
+}
+
+provider "vsphere" {
+  user                 = var.vsphere_user
+  password             = var.vsphere_password
+  vsphere_server       = var.vsphere_server
+  allow_unverified_ssl = false
+}
+
+variable "vsphere_server" {
+  type = string
+}
+
+variable "vsphere_user" {
+  type = string
+}
+
+variable "vsphere_password" {
+  type      = string
+  sensitive = true
+}
+
+variable "netskope_tenant_url" {
+  type = string
+}
+
+variable "netskope_api_token" {
+  type      = string
+  sensitive = true
+}
+
+module "publisher" {
+  source  = "johnneerdael/publisher/netskope//modules/vsphere"
+  version = "~> 2.3"
+
+  name_prefix = "pub-vsphere"
+  replicas    = 2
+  tags        = { Owner = "platform-team", Env = "prod" }
+
+  tenant_url = var.netskope_tenant_url
+  api_token  = var.netskope_api_token
+
+  datacenter    = "dc1"
+  cluster       = "cluster1"
+  datastore     = "vsanDatastore"
+  network_name  = "DVPG-NPA-Publishers"
+  template_name = "netskope-publisher-template"
+  folder        = "Workloads/Netskope"
+
+  num_cpus = 4
+  memory   = 8192
+}
+
+output "publisher_names" {
+  value = module.publisher.publisher_names
+}
+
+output "publisher_vm_ids" {
+  value = {
+    for name, publisher in module.publisher.publishers : name => publisher.vm_id
+  }
+  sensitive = true
 }
 ```
 

@@ -1,6 +1,6 @@
 ---
 title: AWS platform inputs
-date: 2026-05-18
+date: 2026-05-19
 toc: true
 ---
 
@@ -74,9 +74,56 @@ module "publisher" {
 }
 ```
 
-## Full example
+## Full main.tf example — bootstrap, custom user, SSH key, and password
 
 ```hcl
+terraform {
+  required_version = ">= 1.7"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+    tls = {
+      source  = "hashicorp/tls"
+      version = "~> 4.0"
+    }
+  }
+}
+
+provider "aws" {
+  region = var.aws_region
+}
+
+variable "aws_region" {
+  type    = string
+  default = "eu-west-1"
+}
+
+variable "netskope_tenant_url" {
+  type = string
+}
+
+variable "netskope_api_token" {
+  type      = string
+  sensitive = true
+}
+
+variable "npa_password" {
+  type      = string
+  sensitive = true
+}
+
+resource "tls_private_key" "publisher_ssh" {
+  algorithm = "ED25519"
+}
+
+resource "aws_key_pair" "publisher" {
+  key_name   = "npa-publisher-admin"
+  public_key = tls_private_key.publisher_ssh.public_key_openssh
+}
+
 module "publisher" {
   source  = "johnneerdael/publisher/netskope//modules/aws"
   version = "~> 2.3"
@@ -88,10 +135,10 @@ module "publisher" {
   tenant_url = var.netskope_tenant_url
   api_token  = var.netskope_api_token
 
-  subnet_id                   = "subnet-..."
-  security_group_ids          = ["sg-..."]
-  key_name                    = "my-key"
-  instance_type               = "t3.large"
+  subnet_id          = "subnet-..."
+  security_group_ids = ["sg-..."]
+  key_name           = aws_key_pair.publisher.key_name
+  instance_type      = "t3.large"
   # false assumes the subnet has NAT (or another egress path). Flip to true
   # for a public subnet. See:
   # /terraform-netskope-publisher/admin/concepts/connectivity/
@@ -104,10 +151,36 @@ module "publisher" {
     http_tokens   = "required"
   }
 
-  bootstrap                        = true
-  install_user                     = "npa"
-  install_user_password            = var.npa_password # sensitive
-  install_user_ssh_authorized_keys = [file("~/.ssh/team_ed25519.pub")]
+  bootstrap             = true
+  install_user          = "npa"
+  install_user_password = var.npa_password # sensitive
+  install_user_ssh_authorized_keys = [
+    tls_private_key.publisher_ssh.public_key_openssh,
+    file(pathexpand("~/.ssh/team_ed25519.pub")),
+  ]
+
+  guest_network_interface = {
+    name        = "ens5"
+    dhcp4       = true
+    nameservers = ["8.8.8.8", "1.1.1.1"]
+    mtu         = 9001
+  }
+}
+
+output "publisher_names" {
+  value = module.publisher.publisher_names
+}
+
+output "publisher_private_ips" {
+  value = {
+    for name, publisher in module.publisher.publishers : name => publisher.private_ip
+  }
+  sensitive = true
+}
+
+output "publisher_private_key_pem" {
+  value     = tls_private_key.publisher_ssh.private_key_pem
+  sensitive = true
 }
 ```
 

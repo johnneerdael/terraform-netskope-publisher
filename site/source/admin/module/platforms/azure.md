@@ -1,6 +1,6 @@
 ---
 title: Azure platform inputs
-date: 2026-05-18
+date: 2026-05-19
 toc: true
 ---
 
@@ -117,6 +117,103 @@ module "publisher" {
 
 > Verify the exact `publisher` / `offer` / `sku` values against the live
 > Marketplace listing before applying — they can change.
+
+## Full main.tf example — bootstrap, custom user, SSH key, and password
+
+```hcl
+terraform {
+  required_version = ">= 1.7"
+
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 4.0"
+    }
+    tls = {
+      source  = "hashicorp/tls"
+      version = "~> 4.0"
+    }
+  }
+}
+
+provider "azurerm" {
+  features {}
+}
+
+variable "netskope_tenant_url" {
+  type = string
+}
+
+variable "netskope_api_token" {
+  type      = string
+  sensitive = true
+}
+
+variable "npa_password" {
+  type      = string
+  sensitive = true
+}
+
+resource "tls_private_key" "publisher_ssh" {
+  algorithm = "ED25519"
+}
+
+module "publisher" {
+  source  = "johnneerdael/publisher/netskope//modules/azure"
+  version = "~> 2.3"
+
+  name_prefix = "pub-az"
+  replicas    = 2
+  tags        = { Owner = "platform-team", Env = "prod" }
+
+  tenant_url = var.netskope_tenant_url
+  api_token  = var.netskope_api_token
+
+  resource_group_name       = "rg-npa-prod"
+  location                  = "westeurope"
+  subnet_id                 = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-network/providers/Microsoft.Network/virtualNetworks/vnet-prod/subnets/snet-publisher"
+  network_security_group_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-network/providers/Microsoft.Network/networkSecurityGroups/nsg-publisher"
+  assign_public_ip          = false
+  vm_size                   = "Standard_D4s_v5"
+  admin_username            = "npa"
+  admin_ssh_public_key      = tls_private_key.publisher_ssh.public_key_openssh
+
+  os_disk = {
+    type    = "Premium_LRS"
+    size_gb = 128
+  }
+
+  bootstrap             = true
+  install_user          = "npa"
+  install_user_password = var.npa_password # sensitive
+  install_user_ssh_authorized_keys = [
+    file(pathexpand("~/.ssh/team_ed25519.pub")),
+  ]
+
+  guest_network_interface = {
+    name        = "eth0"
+    dhcp4       = true
+    nameservers = ["168.63.129.16"]
+    mtu         = 1500
+  }
+}
+
+output "publisher_names" {
+  value = module.publisher.publisher_names
+}
+
+output "publisher_private_ips" {
+  value = {
+    for name, publisher in module.publisher.publishers : name => publisher.private_ip
+  }
+  sensitive = true
+}
+
+output "publisher_private_key_pem" {
+  value     = tls_private_key.publisher_ssh.private_key_pem
+  sensitive = true
+}
+```
 
 ## Platform-specific outputs
 

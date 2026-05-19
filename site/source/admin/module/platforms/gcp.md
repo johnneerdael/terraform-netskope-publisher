@@ -1,6 +1,6 @@
 ---
 title: GCP platform inputs
-date: 2026-05-18
+date: 2026-05-19
 toc: true
 ---
 
@@ -119,6 +119,111 @@ module "publisher" {
 When `install_user` differs from `ubuntu`, cloud-init removes the
 image's default `ubuntu` account during first boot (override with
 `delete_default_user = false`).
+
+## Full main.tf example — bootstrap, custom user, SSH key, and password
+
+```hcl
+terraform {
+  required_version = ">= 1.7"
+
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 6.0"
+    }
+    tls = {
+      source  = "hashicorp/tls"
+      version = "~> 4.0"
+    }
+  }
+}
+
+provider "google" {
+  project = var.gcp_project
+  region  = "europe-west4"
+  zone    = "europe-west4-a"
+}
+
+variable "gcp_project" {
+  type = string
+}
+
+variable "netskope_tenant_url" {
+  type = string
+}
+
+variable "netskope_api_token" {
+  type      = string
+  sensitive = true
+}
+
+variable "npa_password" {
+  type      = string
+  sensitive = true
+}
+
+resource "tls_private_key" "publisher_ssh" {
+  algorithm = "ED25519"
+}
+
+module "publisher" {
+  source  = "johnneerdael/publisher/netskope//modules/gcp"
+  version = "~> 2.3"
+
+  name_prefix = "pub-gcp"
+  replicas    = 2
+  tags        = { owner = "platform-team", env = "prod" }
+
+  tenant_url = var.netskope_tenant_url
+  api_token  = var.netskope_api_token
+
+  project          = var.gcp_project
+  zone             = "europe-west4-a"
+  network          = "vpc-prod"
+  subnetwork       = "snet-publisher"
+  machine_type     = "e2-standard-4"
+  image            = "projects/ubuntu-os-cloud/global/images/family/ubuntu-minimal-2204-lts"
+  assign_public_ip = false
+  network_tags     = ["npa-publisher"]
+
+  service_account = {
+    email  = "npa-publisher@${var.gcp_project}.iam.gserviceaccount.com"
+    scopes = ["https://www.googleapis.com/auth/cloud-platform"]
+  }
+
+  bootstrap             = true
+  nonat                 = true
+  install_user          = "npa"
+  install_user_password = var.npa_password # sensitive
+  install_user_ssh_authorized_keys = [
+    tls_private_key.publisher_ssh.public_key_openssh,
+    file(pathexpand("~/.ssh/team_ed25519.pub")),
+  ]
+
+  guest_network_interface = {
+    name        = "ens4"
+    dhcp4       = true
+    nameservers = ["169.254.169.254", "8.8.8.8"]
+    mtu         = 1460
+  }
+}
+
+output "publisher_names" {
+  value = module.publisher.publisher_names
+}
+
+output "publisher_private_ips" {
+  value = {
+    for name, publisher in module.publisher.publishers : name => publisher.private_ip
+  }
+  sensitive = true
+}
+
+output "publisher_private_key_pem" {
+  value     = tls_private_key.publisher_ssh.private_key_pem
+  sensitive = true
+}
+```
 
 ## Platform-specific outputs
 
