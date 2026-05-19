@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="⚠️ The publisher VM needs outbound TCP&#x2F;443 to your Netskope tenant.See Connectivity requirements → Hyper-Vfor vswitch, host firewall, and DNS considerations.  Inputs   Name Type Default Descript">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Hyper-V platform inputs">
+<meta property="og:url" content="https://johnneerdael.github.io/terraform-netskope-publisher/admin/module/platforms/hyperv">
+<meta property="og:site_name" content="terraform-netskope-publisher">
+<meta property="og:description" content="⚠️ The publisher VM needs outbound TCP&#x2F;443 to your Netskope tenant.See Connectivity requirements → Hyper-Vfor vswitch, host firewall, and DNS considerations.  Inputs   Name Type Default Descript">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-05-18T22:00:00.000Z">
+<meta property="article:modified_time" content="2026-05-19T19:03:19.803Z">
+<meta property="article:author" content="John Neerdael">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/terraform-netskope-publisher/images/netskope-favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/terraform-netskope-publisher/images/netskope-favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/terraform-netskope-publisher/images/netskope-apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Hyper-V platform inputs</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/terraform-netskope-publisher/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+    <div class="content index py4 ">
+        
+          <header id="header">
+  <a class="u-url u-uid" href="/terraform-netskope-publisher/">
+  
+    
+      <img id="logo" alt class="u-logo" src="/terraform-netskope-publisher/images/netskope-logo.png" />
+    
+  
+    <div id="title">
+      <h1 class="p-name">terraform-netskope-publisher</h1>
+    </div>
+  </a>
+  <div id="nav">
+    <ul>
+      <li class="icon">
+        <a href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-2x"></i></a>
+      </li>
+      <!--
+     --><li><a href="/terraform-netskope-publisher/">Home</a></li><!--
+   --><!--
+     --><li><a href="/terraform-netskope-publisher/starter/">starter</a></li><!--
+   --><!--
+     --><li><a href="/terraform-netskope-publisher/admin/">admin</a></li><!--
+   --><!--
+     --><li><a href="/terraform-netskope-publisher/reference/">reference</a></li><!--
+   --><!--
+     --><li><a target="_blank" rel="noopener" href="https://github.com/johnneerdael/terraform-netskope-publisher">github</a></li><!--
+   -->
+    </ul>
+  </div>
+</header>
+
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  
+
+  <div class="content" itemprop="articleBody">
+      
+          <blockquote>
+<p>⚠️ The publisher VM needs outbound TCP&#x2F;443 to your Netskope tenant.<br>See <a href="/terraform-netskope-publisher/admin/concepts/connectivity/">Connectivity requirements → Hyper-V</a><br>for vswitch, host firewall, and DNS considerations.</p>
+</blockquote>
+<h2><span id="inputs">Inputs</span></h2><table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>vswitch_name</code></td>
+<td>string</td>
+<td>required</td>
+<td>Name of the Hyper-V virtual switch the publisher NIC attaches to.</td>
+</tr>
+<tr>
+<td><code>hyperv_winrm_config</code></td>
+<td>object</td>
+<td>required</td>
+<td><code>&#123; host, user, password, port, https, insecure, use_ntlm &#125;</code> — mirror your <code>provider &quot;hyperv&quot;</code> block.</td>
+</tr>
+<tr>
+<td><code>vhdx_source_url</code></td>
+<td>string</td>
+<td>Netskope S3 URL</td>
+<td>Where to download the master VHDX from. Default is <code>https://s3-us-west-2.amazonaws.com/publisher.netskope.com/latest/NetskopePrivateAccessPublisher.vhdx</code>.</td>
+</tr>
+<tr>
+<td><code>vhdx_cache_path</code></td>
+<td>string</td>
+<td><code>C:\hyperv\netskope\NetskopePrivateAccessPublisher.vhdx</code></td>
+<td>Where on the host to cache the master VHDX.</td>
+</tr>
+<tr>
+<td><code>vhd_dir</code></td>
+<td>string</td>
+<td><code>C:\hyperv\netskope\vhds</code></td>
+<td>Per-VM cloned VHD directory.</td>
+</tr>
+<tr>
+<td><code>iso_dir</code></td>
+<td>string</td>
+<td><code>C:\hyperv\netskope\iso</code></td>
+<td>Per-VM seed ISO directory.</td>
+</tr>
+<tr>
+<td><code>vm_dir</code></td>
+<td>string</td>
+<td><code>C:\hyperv\netskope\vms</code></td>
+<td>Per-VM VM-config directory.</td>
+</tr>
+<tr>
+<td><code>processor_count</code></td>
+<td>number</td>
+<td><code>2</code></td>
+<td>vCPUs.</td>
+</tr>
+<tr>
+<td><code>memory_startup_bytes</code></td>
+<td>number</td>
+<td><code>4294967296</code></td>
+<td>4 GiB.</td>
+</tr>
+<tr>
+<td><code>dynamic_memory</code></td>
+<td>bool</td>
+<td><code>false</code></td>
+<td>Publishers benefit from fixed memory.</td>
+</tr>
+<tr>
+<td><code>generation</code></td>
+<td>number</td>
+<td><code>2</code></td>
+<td>Gen 2 (UEFI); required for the Netskope VHDX.</td>
+</tr>
+<tr>
+<td><code>enable_secure_boot</code></td>
+<td>string</td>
+<td><code>&quot;Off&quot;</code></td>
+<td>Linux VMs on Gen 2 → Secure Boot off.</td>
+</tr>
+<tr>
+<td><code>vlan_id</code></td>
+<td>number</td>
+<td><code>null</code></td>
+<td>Optional NIC VLAN tag.</td>
+</tr>
+<tr>
+<td><code>force_redownload</code></td>
+<td>bool</td>
+<td><code>false</code></td>
+<td>Re-fetch the master VHDX even if cached.</td>
+</tr>
+</tbody></table>
+<h2><span id="minimal-example">Minimal example</span></h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">module &quot;publisher&quot; &#123;</span><br><span class="line">  source = &quot;github.com/johnneerdael/terraform-netskope-publisher//modules/hyperv?ref=v2.1.0&quot;</span><br><span class="line"></span><br><span class="line">  tenant_url = var.netskope_tenant_url</span><br><span class="line">  api_token  = var.netskope_api_token</span><br><span class="line"></span><br><span class="line">  vswitch_name = &quot;External vSwitch&quot;</span><br><span class="line"></span><br><span class="line">  hyperv_winrm_config = &#123;</span><br><span class="line">    host     = &quot;hyperv01.lab.local&quot;</span><br><span class="line">    user     = &quot;Administrator&quot;</span><br><span class="line">    password = var.hyperv_password</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2><span id="full-maintf-example">Full main.tf example</span></h2><p>Hyper-V boots the Netskope VHDX and delivers only registration cloud-init<br>through a NoCloud ISO. This submodule does not expose the AWS&#x2F;Azure&#x2F;GCP<br>bootstrap-only <code>install_user</code>, <code>install_user_password</code>, or<br><code>install_user_ssh_authorized_keys</code> inputs.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line">terraform &#123;</span><br><span class="line">  required_version = &quot;&gt;= 1.7&quot;</span><br><span class="line"></span><br><span class="line">  required_providers &#123;</span><br><span class="line">    hyperv = &#123;</span><br><span class="line">      source  = &quot;taliesins/hyperv&quot;</span><br><span class="line">      version = &quot;~&gt; 1.2&quot;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">provider &quot;hyperv&quot; &#123;</span><br><span class="line">  host     = &quot;hyperv01.lab.local&quot;</span><br><span class="line">  user     = &quot;DOMAIN\\svc-terraform&quot;</span><br><span class="line">  password = var.hyperv_password</span><br><span class="line">  port     = 5986</span><br><span class="line">  https    = true</span><br><span class="line">  insecure = false</span><br><span class="line">  use_ntlm = true</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">variable &quot;hyperv_password&quot; &#123;</span><br><span class="line">  type      = string</span><br><span class="line">  sensitive = true</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">variable &quot;netskope_tenant_url&quot; &#123;</span><br><span class="line">  type = string</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">variable &quot;netskope_api_token&quot; &#123;</span><br><span class="line">  type      = string</span><br><span class="line">  sensitive = true</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module &quot;publisher&quot; &#123;</span><br><span class="line">  source  = &quot;johnneerdael/publisher/netskope//modules/hyperv&quot;</span><br><span class="line">  version = &quot;~&gt; 2.3&quot;</span><br><span class="line"></span><br><span class="line">  name_prefix = &quot;pub-hv&quot;</span><br><span class="line">  replicas    = 2</span><br><span class="line">  tags        = &#123; Owner = &quot;platform-team&quot;, Env = &quot;prod&quot; &#125;</span><br><span class="line"></span><br><span class="line">  tenant_url = var.netskope_tenant_url</span><br><span class="line">  api_token  = var.netskope_api_token</span><br><span class="line"></span><br><span class="line">  vswitch_name         = &quot;vSwitch-Prod&quot;</span><br><span class="line">  vlan_id              = 100</span><br><span class="line">  processor_count      = 4</span><br><span class="line">  memory_startup_bytes = 8589934592 # 8 GiB</span><br><span class="line">  enable_secure_boot   = &quot;Off&quot;</span><br><span class="line"></span><br><span class="line">  hyperv_winrm_config = &#123;</span><br><span class="line">    host     = &quot;hyperv01.lab.local&quot;</span><br><span class="line">    user     = &quot;DOMAIN\\svc-terraform&quot;</span><br><span class="line">    password = var.hyperv_password</span><br><span class="line">    port     = 5986</span><br><span class="line">    https    = true</span><br><span class="line">    insecure = false</span><br><span class="line">    use_ntlm = true</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">output &quot;publisher_names&quot; &#123;</span><br><span class="line">  value = module.publisher.publisher_names</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">output &quot;publisher_vm_ids&quot; &#123;</span><br><span class="line">  value = &#123;</span><br><span class="line">    for name, publisher in module.publisher.publishers : name =&gt; publisher.vm_id</span><br><span class="line">  &#125;</span><br><span class="line">  sensitive = true</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2><span id="platform-specific-outputs">Platform-specific outputs</span></h2><table>
+<thead>
+<tr>
+<th>Output</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>vm_ids</code></td>
+<td>list(string)</td>
+<td><code>hyperv_machine_instance</code> IDs in publisher-name order.</td>
+</tr>
+<tr>
+<td><code>seed_iso_paths_by_name</code></td>
+<td>map(string)</td>
+<td>Per-publisher NoCloud seed ISO path on the host.</td>
+</tr>
+</tbody></table>
+<h2><span id="caveats">Caveats</span></h2><ul>
+<li><strong>Provider authenticates over WinRM eagerly.</strong> Plan + apply both<br>require a reachable Hyper-V host with valid WinRM credentials. The<br>module’s <code>null_resource</code> provisioners use the same WinRM config.</li>
+<li><strong>First-apply download is large.</strong> The master VHDX is ~3 GiB and gets<br>downloaded once per <code>vhdx_cache_path</code> on the host. Subsequent replicas<br>share it.</li>
+<li><strong>User-data changes don’t auto-reboot the VM.</strong> Editing inputs that<br>affect cloud-init (e.g., <code>wizard_path</code>) rebuilds the seed ISO but the<br>VM keeps running. To pick up the change:<br><code>terraform taint &#39;module.publisher.hyperv_machine_instance.publisher[&quot;&lt;name&gt;&quot;]&#39;</code><ul>
+<li><code>terraform apply</code>.</li>
+</ul>
+</li>
+<li><strong><code>private_ip</code> is <code>null</code> in module outputs.</strong> Hyper-V reports IPs via<br>Integration Services &#x2F; KVP asynchronously; the module does not surface<br>them. Use the Hyper-V console or <code>Get-VMNetworkAdapter -VMName &lt;name&gt;</code><br>to find addresses post-boot.</li>
+<li><strong><code>tags</code> not native to Hyper-V</strong> — written into each VM’s <code>notes</code><br>field as a JSON object.</li>
+</ul>
+<h2><span id="winrm-bootstrap-hyper-v-host">WinRM bootstrap (Hyper-V host)</span></h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">winrm quickconfig</span><br><span class="line"><span class="variable">$cert</span> = <span class="built_in">New-SelfSignedCertificate</span> <span class="literal">-CertStoreLocation</span> cert:\LocalMachine\My `</span><br><span class="line">          <span class="literal">-DnsName</span> <span class="variable">$env:COMPUTERNAME</span></span><br><span class="line"><span class="built_in">New-Item</span> <span class="literal">-Path</span> WSMan:\localhost\Listener <span class="literal">-Transport</span> HTTPS `</span><br><span class="line">         <span class="literal">-Address</span> * <span class="literal">-CertificateThumbPrint</span> <span class="variable">$cert</span>.Thumbprint <span class="literal">-Force</span></span><br><span class="line"><span class="built_in">New-NetFirewallRule</span> <span class="literal">-DisplayName</span> <span class="string">&quot;WinRM-HTTPS&quot;</span> <span class="literal">-Direction</span> Inbound `</span><br><span class="line">                    <span class="literal">-LocalPort</span> <span class="number">5986</span> <span class="literal">-Protocol</span> TCP <span class="literal">-Action</span> Allow</span><br></pre></td></tr></table></figure>
+
+<p>For production: use a CA-issued cert, kerberos auth, and a service<br>account scoped to Hyper-V management.</p>
+
+        
+  </div>
+</article>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2026
+    John Neerdael
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/terraform-netskope-publisher/">Home</a></li><!--
+     --><!--
+       --><li><a href="/terraform-netskope-publisher/starter/">starter</a></li><!--
+     --><!--
+       --><li><a href="/terraform-netskope-publisher/admin/">admin</a></li><!--
+     --><!--
+       --><li><a href="/terraform-netskope-publisher/reference/">reference</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/johnneerdael/terraform-netskope-publisher">github</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+
+<script src="/terraform-netskope-publisher/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+<footer class="version-footer" style="text-align:center; padding:1rem 0; opacity:0.6; font-size:0.85rem;">Applies to terraform-netskope-publisher v2.x</footer></body>
+</html>

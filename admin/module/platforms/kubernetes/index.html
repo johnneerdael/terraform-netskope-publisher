@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="⚠️ The publisher Pods need outbound TCP&#x2F;443 to your Netskope tenant.See Connectivity requirements → Kubernetesfor NetworkPolicy, egress proxy, and image-pull notes.  InputsThe kubernetes submodu">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Kubernetes platform inputs">
+<meta property="og:url" content="https://johnneerdael.github.io/terraform-netskope-publisher/admin/module/platforms/kubernetes">
+<meta property="og:site_name" content="terraform-netskope-publisher">
+<meta property="og:description" content="⚠️ The publisher Pods need outbound TCP&#x2F;443 to your Netskope tenant.See Connectivity requirements → Kubernetesfor NetworkPolicy, egress proxy, and image-pull notes.  InputsThe kubernetes submodu">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-05-18T22:00:00.000Z">
+<meta property="article:modified_time" content="2026-05-19T19:03:19.803Z">
+<meta property="article:author" content="John Neerdael">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/terraform-netskope-publisher/images/netskope-favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/terraform-netskope-publisher/images/netskope-favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/terraform-netskope-publisher/images/netskope-apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Kubernetes platform inputs</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/terraform-netskope-publisher/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+    <div class="content index py4 ">
+        
+          <header id="header">
+  <a class="u-url u-uid" href="/terraform-netskope-publisher/">
+  
+    
+      <img id="logo" alt class="u-logo" src="/terraform-netskope-publisher/images/netskope-logo.png" />
+    
+  
+    <div id="title">
+      <h1 class="p-name">terraform-netskope-publisher</h1>
+    </div>
+  </a>
+  <div id="nav">
+    <ul>
+      <li class="icon">
+        <a href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-2x"></i></a>
+      </li>
+      <!--
+     --><li><a href="/terraform-netskope-publisher/">Home</a></li><!--
+   --><!--
+     --><li><a href="/terraform-netskope-publisher/starter/">starter</a></li><!--
+   --><!--
+     --><li><a href="/terraform-netskope-publisher/admin/">admin</a></li><!--
+   --><!--
+     --><li><a href="/terraform-netskope-publisher/reference/">reference</a></li><!--
+   --><!--
+     --><li><a target="_blank" rel="noopener" href="https://github.com/johnneerdael/terraform-netskope-publisher">github</a></li><!--
+   -->
+    </ul>
+  </div>
+</header>
+
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  
+
+  <div class="content" itemprop="articleBody">
+      
+          <blockquote>
+<p>⚠️ The publisher Pods need outbound TCP&#x2F;443 to your Netskope tenant.<br>See <a href="/terraform-netskope-publisher/admin/concepts/connectivity/">Connectivity requirements → Kubernetes</a><br>for NetworkPolicy, egress proxy, and image-pull notes.</p>
+</blockquote>
+<h2><span id="inputs">Inputs</span></h2><p>The <code>kubernetes</code> submodule accepts:</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>namespace</code></td>
+<td>string</td>
+<td><code>&quot;netskope&quot;</code></td>
+<td>Created if it does not exist.</td>
+</tr>
+<tr>
+<td><code>enrollment_mode</code></td>
+<td>string</td>
+<td><code>&quot;token&quot;</code></td>
+<td><code>&quot;token&quot;</code> (Terraform owns the publisher record) or <code>&quot;api&quot;</code> (chart self-registers).</td>
+</tr>
+<tr>
+<td><code>chart_version</code></td>
+<td>string</td>
+<td><code>&quot;~&gt; 1.4&quot;</code></td>
+<td>Helm chart version constraint.</td>
+</tr>
+<tr>
+<td><code>chart_repository</code></td>
+<td>string</td>
+<td><code>&quot;oci://ghcr.io/johnneerdael/charts&quot;</code></td>
+<td>Helm chart repository URL.</td>
+</tr>
+<tr>
+<td><code>chart_values</code></td>
+<td>any</td>
+<td><code>&#123;&#125;</code></td>
+<td>Free-form values merged into the Helm release last (escape hatch).</td>
+</tr>
+<tr>
+<td><code>workload_type</code></td>
+<td>string</td>
+<td><code>&quot;daemonset&quot;</code></td>
+<td><code>&quot;daemonset&quot;</code> or <code>&quot;statefulset&quot;</code>. <code>&quot;statefulset&quot;</code> is required for HPA.</td>
+</tr>
+<tr>
+<td><code>hpa_enabled</code></td>
+<td>bool</td>
+<td><code>false</code></td>
+<td>Enable HorizontalPodAutoscaler. Only meaningful with <code>workload_type = &quot;statefulset&quot;</code>.</td>
+</tr>
+<tr>
+<td><code>hpa_min_replicas</code></td>
+<td>number</td>
+<td><code>2</code></td>
+<td>HPA minimum.</td>
+</tr>
+<tr>
+<td><code>hpa_max_replicas</code></td>
+<td>number</td>
+<td><code>6</code></td>
+<td>HPA maximum.</td>
+</tr>
+<tr>
+<td><code>image_repository</code></td>
+<td>string</td>
+<td><code>null</code></td>
+<td>Override the publisher container image (e.g. private mirror).</td>
+</tr>
+<tr>
+<td><code>image_tag</code></td>
+<td>string</td>
+<td><code>null</code></td>
+<td>Override the image tag.</td>
+</tr>
+</tbody></table>
+<p>The <code>wizard_path</code> common input is <strong>not</strong> used here — the chart’s<br>container image already has the wizard at its canonical location.</p>
+<h2><span id="minimal-example-token-mode-byo-cluster">Minimal example (token mode, BYO cluster)</span></h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">provider &quot;kubernetes&quot; &#123; config_path = &quot;~/.kube/config&quot; &#125;</span><br><span class="line">provider &quot;helm&quot; &#123;</span><br><span class="line">  kubernetes &#123; config_path = &quot;~/.kube/config&quot; &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module &quot;publisher&quot; &#123;</span><br><span class="line">  source  = &quot;johnneerdael/publisher/netskope//modules/kubernetes&quot;</span><br><span class="line">  version = &quot;~&gt; 2.2&quot;</span><br><span class="line"></span><br><span class="line">  tenant_url = var.netskope_tenant_url</span><br><span class="line">  api_token  = var.netskope_api_token</span><br><span class="line"></span><br><span class="line">  namespace = &quot;netskope&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2><span id="full-maintf-example-api-mode-hpa-statefulset">Full main.tf example — API mode, HPA, StatefulSet</span></h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line">terraform &#123;</span><br><span class="line">  required_version = &quot;&gt;= 1.7&quot;</span><br><span class="line"></span><br><span class="line">  required_providers &#123;</span><br><span class="line">    kubernetes = &#123;</span><br><span class="line">      source  = &quot;hashicorp/kubernetes&quot;</span><br><span class="line">      version = &quot;~&gt; 2.30&quot;</span><br><span class="line">    &#125;</span><br><span class="line">    helm = &#123;</span><br><span class="line">      source  = &quot;hashicorp/helm&quot;</span><br><span class="line">      version = &quot;~&gt; 2.13&quot;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">provider &quot;kubernetes&quot; &#123;</span><br><span class="line">  config_path    = pathexpand(&quot;~/.kube/config&quot;)</span><br><span class="line">  config_context = &quot;prod&quot;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">provider &quot;helm&quot; &#123;</span><br><span class="line">  kubernetes &#123;</span><br><span class="line">    config_path    = pathexpand(&quot;~/.kube/config&quot;)</span><br><span class="line">    config_context = &quot;prod&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">variable &quot;netskope_tenant_url&quot; &#123;</span><br><span class="line">  type = string</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">variable &quot;netskope_api_token&quot; &#123;</span><br><span class="line">  type      = string</span><br><span class="line">  sensitive = true</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module &quot;publisher&quot; &#123;</span><br><span class="line">  source  = &quot;johnneerdael/publisher/netskope//modules/kubernetes&quot;</span><br><span class="line">  version = &quot;~&gt; 2.2&quot;</span><br><span class="line"></span><br><span class="line">  name_prefix = &quot;pub-k8s&quot;</span><br><span class="line">  replicas    = 1</span><br><span class="line">  tags        = &#123; team = &quot;platform&quot;, env = &quot;prod&quot; &#125;</span><br><span class="line"></span><br><span class="line">  tenant_url = var.netskope_tenant_url</span><br><span class="line">  api_token  = var.netskope_api_token</span><br><span class="line"></span><br><span class="line">  namespace        = &quot;netskope&quot;</span><br><span class="line">  enrollment_mode  = &quot;api&quot;</span><br><span class="line">  workload_type    = &quot;statefulset&quot;</span><br><span class="line">  hpa_enabled      = true</span><br><span class="line">  hpa_min_replicas = 3</span><br><span class="line">  hpa_max_replicas = 10</span><br><span class="line"></span><br><span class="line">  image_repository = &quot;registry.example.com/netskope/publisher_u22&quot;</span><br><span class="line">  image_tag        = &quot;latest&quot;</span><br><span class="line"></span><br><span class="line">  chart_values = &#123;</span><br><span class="line">    podAnnotations = &#123;</span><br><span class="line">      &quot;prometheus.io/scrape&quot; = &quot;true&quot;</span><br><span class="line">      &quot;prometheus.io/port&quot;   = &quot;9090&quot;</span><br><span class="line">    &#125;</span><br><span class="line">    resources = &#123;</span><br><span class="line">      requests = &#123;</span><br><span class="line">        cpu    = &quot;500m&quot;</span><br><span class="line">        memory = &quot;1Gi&quot;</span><br><span class="line">      &#125;</span><br><span class="line">      limits = &#123;</span><br><span class="line">        cpu    = &quot;2&quot;</span><br><span class="line">        memory = &quot;4Gi&quot;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">output &quot;helm_release_names&quot; &#123;</span><br><span class="line">  value = module.publisher.helm_release_names</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">output &quot;publisher_names&quot; &#123;</span><br><span class="line">  value = module.publisher.publisher_names</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Kubernetes does not use VM bootstrap, SSH users, private keys, or<br>passwords. The equivalent customization points are Helm values, image<br>overrides, workload type, and enrollment mode.</p>
+<h2><span id="platform-specific-outputs">Platform-specific outputs</span></h2><table>
+<thead>
+<tr>
+<th>Output</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>helm_release_names</code></td>
+<td>list(string)</td>
+<td>Names of Helm releases created by this module.</td>
+</tr>
+<tr>
+<td><code>publishers</code></td>
+<td>map (sensitive)</td>
+<td>Per-publisher data (token mode populates <code>publisher_id</code> + <code>registration_token</code>; api mode leaves both <code>null</code>).</td>
+</tr>
+</tbody></table>
+<h2><span id="enrollment-modes-when-to-pick-which">Enrollment modes — when to pick which</span></h2><table>
+<thead>
+<tr>
+<th></th>
+<th><code>token</code> (default)</th>
+<th><code>api</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Registration owner</td>
+<td>Terraform (via <code>npa_publisher</code> resources)</td>
+<td>Chart container on Pod start</td>
+</tr>
+<tr>
+<td>Replicas</td>
+<td>One Helm release per name; each consumes one token</td>
+<td>One Helm release; HPA &#x2F; StatefulSet scales internally</td>
+</tr>
+<tr>
+<td>Drift on rename</td>
+<td>Detected by <code>npa_publisher</code> Terraform state</td>
+<td>Not detected</td>
+</tr>
+<tr>
+<td><code>terraform destroy</code> removes publisher record</td>
+<td>Yes</td>
+<td>Only when <code>enrollment.api.cleanupOnDelete = true</code> AND no Private Apps attached</td>
+</tr>
+<tr>
+<td>Recommended for</td>
+<td>One-publisher-per-Pod, mirrors the VM submodule UX</td>
+<td>HPA &#x2F; StatefulSet autoscaling</td>
+</tr>
+</tbody></table>
+<h2><span id="caveats">Caveats</span></h2><ul>
+<li><strong>Chart pull from Internet.</strong> The default repository is the public OCI<br>artifact at <code>ghcr.io/johnneerdael/charts</code>. Air-gapped clusters need to<br>mirror it; set <code>chart_repository</code> to point at the mirror.</li>
+<li><strong>Image pull from Docker Hub.</strong> The chart pulls<br><code>netskopeprivateaccess/publisher_u22</code> from Docker Hub by default.<br>Mirror via <code>image_repository</code> if your cluster cannot reach Docker Hub.</li>
+<li><strong>HPA only valid with StatefulSet.</strong> If you set <code>hpa_enabled = true</code><br>without <code>workload_type = &quot;statefulset&quot;</code>, the module renders the HPA<br>block but Kubernetes will not autoscale a DaemonSet.</li>
+<li><strong><code>api</code>-mode publisher deletion</strong> has known constraints — see the<br>chart’s <a target="_blank" rel="noopener" href="https://github.com/johnneerdael/kubernetes-netskope-publisher#enrollmentapicleanupondelete">DELETE-cannot-remove-attached-apps note</a>.</li>
+</ul>
+
+        
+  </div>
+</article>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2026
+    John Neerdael
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/terraform-netskope-publisher/">Home</a></li><!--
+     --><!--
+       --><li><a href="/terraform-netskope-publisher/starter/">starter</a></li><!--
+     --><!--
+       --><li><a href="/terraform-netskope-publisher/admin/">admin</a></li><!--
+     --><!--
+       --><li><a href="/terraform-netskope-publisher/reference/">reference</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/johnneerdael/terraform-netskope-publisher">github</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+
+<script src="/terraform-netskope-publisher/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+<footer class="version-footer" style="text-align:center; padding:1rem 0; opacity:0.6; font-size:0.85rem;">Applies to terraform-netskope-publisher v2.x</footer></body>
+</html>

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="Two install modes (v2.3+)modules&#x2F;aws, modules&#x2F;azure, and modules&#x2F;gcp each support two waysof getting the Publisher onto the VM:    Mode Toggle Image Wizard install    Bootstrap bootstrap &#x3D; true Stock">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Bring your own image">
+<meta property="og:url" content="https://johnneerdael.github.io/terraform-netskope-publisher/admin/how-to/byo-image">
+<meta property="og:site_name" content="terraform-netskope-publisher">
+<meta property="og:description" content="Two install modes (v2.3+)modules&#x2F;aws, modules&#x2F;azure, and modules&#x2F;gcp each support two waysof getting the Publisher onto the VM:    Mode Toggle Image Wizard install    Bootstrap bootstrap &#x3D; true Stock">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-05-17T22:00:00.000Z">
+<meta property="article:modified_time" content="2026-05-19T19:03:19.802Z">
+<meta property="article:author" content="John Neerdael">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/terraform-netskope-publisher/images/netskope-favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/terraform-netskope-publisher/images/netskope-favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/terraform-netskope-publisher/images/netskope-apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Bring your own image</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/terraform-netskope-publisher/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+    <div class="content index py4 ">
+        
+          <header id="header">
+  <a class="u-url u-uid" href="/terraform-netskope-publisher/">
+  
+    
+      <img id="logo" alt class="u-logo" src="/terraform-netskope-publisher/images/netskope-logo.png" />
+    
+  
+    <div id="title">
+      <h1 class="p-name">terraform-netskope-publisher</h1>
+    </div>
+  </a>
+  <div id="nav">
+    <ul>
+      <li class="icon">
+        <a href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-2x"></i></a>
+      </li>
+      <!--
+     --><li><a href="/terraform-netskope-publisher/">Home</a></li><!--
+   --><!--
+     --><li><a href="/terraform-netskope-publisher/starter/">starter</a></li><!--
+   --><!--
+     --><li><a href="/terraform-netskope-publisher/admin/">admin</a></li><!--
+   --><!--
+     --><li><a href="/terraform-netskope-publisher/reference/">reference</a></li><!--
+   --><!--
+     --><li><a target="_blank" rel="noopener" href="https://github.com/johnneerdael/terraform-netskope-publisher">github</a></li><!--
+   -->
+    </ul>
+  </div>
+</header>
+
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  
+
+  <div class="content" itemprop="articleBody">
+      
+          <h2><span id="two-install-modes-v23">Two install modes (v2.3+)</span></h2><p><code>modules/aws</code>, <code>modules/azure</code>, and <code>modules/gcp</code> each support two ways<br>of getting the Publisher onto the VM:</p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Toggle</th>
+<th>Image</th>
+<th>Wizard install</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Bootstrap</strong></td>
+<td><code>bootstrap = true</code></td>
+<td>Stock Canonical Ubuntu 22.04 LTS Minimal — auto-resolved per platform</td>
+<td>Cloud-init <code>curl … bootstrap.sh | sudo bash</code></td>
+</tr>
+<tr>
+<td><strong>Pre-baked</strong></td>
+<td><code>bootstrap = false</code></td>
+<td>Netskope Publisher AMI &#x2F; marketplace image &#x2F; GCE image, or your own custom image</td>
+<td>Already on disk</td>
+</tr>
+</tbody></table>
+<p><code>bootstrap</code> defaults to:</p>
+<ul>
+<li><code>true</code> on <code>modules/gcp</code> (with <code>nonat = true</code> for the 1460-byte MTU)</li>
+<li><code>false</code> on <code>modules/aws</code> and <code>modules/azure</code> (backward-compatible)</li>
+</ul>
+<p><code>vsphere</code> and <code>hyperv</code> always use a pre-supplied image &#x2F; template (no<br>bootstrap path today). <code>kubernetes</code> ships the wizard in the Helm chart’s<br>container image.</p>
+<h2><span id="bootstrap-mode-stock-canonical-ubuntu">Bootstrap mode (stock Canonical Ubuntu)</span></h2><p>Use this when you don’t want to subscribe to Netskope’s marketplace<br>image, or when you want to customise the install user, password, SSH<br>keys, or netplan from Terraform.</p>
+<h3><span id="auto-resolved-images-per-platform">Auto-resolved images per platform</span></h3><table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>Image resolved when <code>bootstrap = true</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>AWS</td>
+<td>Most-recent AMI matching owner <code>099720109477</code> (Canonical), name <code>ubuntu-minimal/images/hvm-ssd*/ubuntu-jammy-22.04-amd64-minimal-*</code>, x86_64, hvm</td>
+</tr>
+<tr>
+<td>Azure</td>
+<td>Marketplace reference <code>Canonical / 0001-com-ubuntu-minimal-jammy / minimal-22_04-lts-gen2 / latest</code> (no <code>plan &#123;&#125;</code> required)</td>
+</tr>
+<tr>
+<td>GCP</td>
+<td><code>projects/ubuntu-os-cloud/global/images/family/ubuntu-minimal-2204-lts</code> (set explicitly on <code>examples/gcp-single</code>)</td>
+</tr>
+</tbody></table>
+<h3><span id="aws-bootstrap-example">AWS bootstrap example</span></h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">module &quot;publisher&quot; &#123;</span><br><span class="line">  source  = &quot;johnneerdael/publisher/netskope//modules/aws&quot;</span><br><span class="line">  version = &quot;~&gt; 2.3&quot;</span><br><span class="line"></span><br><span class="line">  tenant_url = var.netskope_tenant_url</span><br><span class="line">  api_token  = var.netskope_api_token</span><br><span class="line"></span><br><span class="line">  subnet_id          = var.subnet_id</span><br><span class="line">  security_group_ids = [var.security_group_id]</span><br><span class="line">  key_name           = var.key_name</span><br><span class="line"></span><br><span class="line">  bootstrap = true</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>ami_id</code> is still respected when explicitly set — passing both<br><code>bootstrap = true</code> and <code>ami_id = &quot;ami-...&quot;</code> boots your AMI and still runs<br>the bootstrap script. Use that to lock to a specific Ubuntu AMI version<br>rather than <code>most_recent</code>.</p>
+<h3><span id="azure-bootstrap-example">Azure bootstrap example</span></h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">module &quot;publisher&quot; &#123;</span><br><span class="line">  source  = &quot;johnneerdael/publisher/netskope//modules/azure&quot;</span><br><span class="line">  version = &quot;~&gt; 2.3&quot;</span><br><span class="line"></span><br><span class="line">  tenant_url = var.netskope_tenant_url</span><br><span class="line">  api_token  = var.netskope_api_token</span><br><span class="line"></span><br><span class="line">  resource_group_name  = &quot;rg-npa&quot;</span><br><span class="line">  location             = &quot;westeurope&quot;</span><br><span class="line">  subnet_id            = &quot;/subscriptions/.../subnets/sn&quot;</span><br><span class="line">  admin_ssh_public_key = file(&quot;~/.ssh/id_rsa.pub&quot;)</span><br><span class="line"></span><br><span class="line">  bootstrap = true</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>admin_username</code> defaults to <code>null</code> in v2.3 and coalesces to<br><code>install_user</code>, so the Azure admin account and the cloud-init install<br>user are always the same. The <code>admin_ssh_key</code> block on the VM resource<br>targets the same username.</p>
+<h3><span id="gcp-bootstrap-example-default">GCP bootstrap example (default)</span></h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">module &quot;publisher&quot; &#123;</span><br><span class="line">  source  = &quot;johnneerdael/publisher/netskope//modules/gcp&quot;</span><br><span class="line">  version = &quot;~&gt; 2.3&quot;</span><br><span class="line"></span><br><span class="line">  tenant_url = var.netskope_tenant_url</span><br><span class="line">  api_token  = var.netskope_api_token</span><br><span class="line"></span><br><span class="line">  project    = &quot;my-gcp-project&quot;</span><br><span class="line">  zone       = &quot;europe-west4-a&quot;</span><br><span class="line">  network    = &quot;default&quot;</span><br><span class="line">  subnetwork = &quot;default&quot;</span><br><span class="line">  # bootstrap / nonat / Ubuntu Minimal family — all defaults</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3><span id="air-gapped-or-mirrored-bootstrap">Air-gapped or mirrored bootstrap</span></h3><p>Override <code>bootstrap_url</code> if the VM can’t reach Netskope’s public S3<br>bucket directly:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bootstrap_url = &quot;https://artifacts.internal.example.com/netskope/publisher/bootstrap.sh&quot;</span><br></pre></td></tr></table></figure>
+
+<p>The script must produce a working <code>npa_publisher_wizard</code> at<br><code>/home/&lt;install_user&gt;/npa_publisher_wizard</code> (or whatever you set<br><code>wizard_path</code> to).</p>
+<h2><span id="pre-baked-image-mode-legacy-x2f-custom">Pre-baked image mode (legacy &#x2F; custom)</span></h2><p>This is the v2.2 behaviour and remains the default on AWS and Azure.<br>Pass an image identifier and leave <code>bootstrap = false</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>Input</th>
+<th>What to pass</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>AWS</td>
+<td><code>aws.ami_id</code></td>
+<td><code>&quot;ami-...&quot;</code> (Netskope’s AMI or your own)</td>
+</tr>
+<tr>
+<td>Azure</td>
+<td><code>azure.image_id</code> or <code>azure.marketplace</code></td>
+<td>Full image resource ID, or marketplace publisher&#x2F;offer&#x2F;sku</td>
+</tr>
+<tr>
+<td>GCP</td>
+<td><code>gcp.image</code></td>
+<td><code>projects/.../global/images/...</code></td>
+</tr>
+<tr>
+<td>vSphere</td>
+<td><code>vsphere.template_name</code></td>
+<td>Template VM name</td>
+</tr>
+<tr>
+<td>Hyper-V</td>
+<td><code>hyperv.master_vhdx_*</code></td>
+<td>URL&#x2F;path to the master VHDX</td>
+</tr>
+</tbody></table>
+<p>Example (AWS, custom AMI):</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">module &quot;publisher&quot; &#123;</span><br><span class="line">  source  = &quot;johnneerdael/publisher/netskope//modules/aws&quot;</span><br><span class="line">  version = &quot;~&gt; 2.3&quot;</span><br><span class="line"></span><br><span class="line">  tenant_url = var.netskope_tenant_url</span><br><span class="line">  api_token  = var.netskope_api_token</span><br><span class="line"></span><br><span class="line">  subnet_id          = var.subnet_id</span><br><span class="line">  security_group_ids = [var.security_group_id]</span><br><span class="line">  key_name           = var.key_name</span><br><span class="line"></span><br><span class="line">  bootstrap = false</span><br><span class="line">  ami_id    = &quot;ami-0123456789abcdef0&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3><span id="requirements-for-a-pre-baked-image">Requirements for a pre-baked image</span></h3><ul>
+<li>Ships <code>npa_publisher_wizard</code> at <code>wizard_path</code> (default<br><code>/home/&lt;install_user&gt;/npa_publisher_wizard</code>, which is<br><code>/home/ubuntu/npa_publisher_wizard</code> when <code>install_user</code> is left at its<br>default).</li>
+<li>Has a cloud-init that runs <code>runcmd</code> from the rendered user-data.</li>
+<li>The user named by <code>install_user</code> already exists (or <code>delete_default_user</code><br>must be <code>false</code> if you want to keep the image’s default user).</li>
+</ul>
+<h2><span id="choosing-between-the-two">Choosing between the two</span></h2><ul>
+<li><strong>Pick bootstrap mode</strong> if you want to avoid marketplace subscriptions,<br>customise the install user &#x2F; password &#x2F; SSH keys &#x2F; netplan from<br>Terraform, or pin to a specific Ubuntu version.</li>
+<li><strong>Pick pre-baked mode</strong> if you want the fastest first boot (no apt<br>install during cloud-init), or if a custom-baked image is already part<br>of your golden-image pipeline.</li>
+</ul>
+
+        
+  </div>
+</article>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2026
+    John Neerdael
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/terraform-netskope-publisher/">Home</a></li><!--
+     --><!--
+       --><li><a href="/terraform-netskope-publisher/starter/">starter</a></li><!--
+     --><!--
+       --><li><a href="/terraform-netskope-publisher/admin/">admin</a></li><!--
+     --><!--
+       --><li><a href="/terraform-netskope-publisher/reference/">reference</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/johnneerdael/terraform-netskope-publisher">github</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+
+<script src="/terraform-netskope-publisher/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+<footer class="version-footer" style="text-align:center; padding:1rem 0; opacity:0.6; font-size:0.85rem;">Applies to terraform-netskope-publisher v2.x</footer></body>
+</html>

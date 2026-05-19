@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="Registration flow failuresError: List publishers failed (status&#x3D;401)The netskope_api_token is missing, expired, or lacks publisherread scope. Mint a fresh token in the Netskope admin console (Settings">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Troubleshooting">
+<meta property="og:url" content="https://johnneerdael.github.io/terraform-netskope-publisher/admin/operations/troubleshooting">
+<meta property="og:site_name" content="terraform-netskope-publisher">
+<meta property="og:description" content="Registration flow failuresError: List publishers failed (status&#x3D;401)The netskope_api_token is missing, expired, or lacks publisherread scope. Mint a fresh token in the Netskope admin console (Settings">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-05-17T22:00:00.000Z">
+<meta property="article:modified_time" content="2026-05-19T19:03:19.803Z">
+<meta property="article:author" content="John Neerdael">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/terraform-netskope-publisher/images/netskope-favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/terraform-netskope-publisher/images/netskope-favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/terraform-netskope-publisher/images/netskope-apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Troubleshooting</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/terraform-netskope-publisher/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+    <div class="content index py4 ">
+        
+          <header id="header">
+  <a class="u-url u-uid" href="/terraform-netskope-publisher/">
+  
+    
+      <img id="logo" alt class="u-logo" src="/terraform-netskope-publisher/images/netskope-logo.png" />
+    
+  
+    <div id="title">
+      <h1 class="p-name">terraform-netskope-publisher</h1>
+    </div>
+  </a>
+  <div id="nav">
+    <ul>
+      <li class="icon">
+        <a href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-2x"></i></a>
+      </li>
+      <!--
+     --><li><a href="/terraform-netskope-publisher/">Home</a></li><!--
+   --><!--
+     --><li><a href="/terraform-netskope-publisher/starter/">starter</a></li><!--
+   --><!--
+     --><li><a href="/terraform-netskope-publisher/admin/">admin</a></li><!--
+   --><!--
+     --><li><a href="/terraform-netskope-publisher/reference/">reference</a></li><!--
+   --><!--
+     --><li><a target="_blank" rel="noopener" href="https://github.com/johnneerdael/terraform-netskope-publisher">github</a></li><!--
+   -->
+    </ul>
+  </div>
+</header>
+
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  
+
+  <div class="content" itemprop="articleBody">
+      
+          <h2><span id="registration-flow-failures">Registration flow failures</span></h2><h3><span id="error-list-publishers-failed-status401"><code>Error: List publishers failed (status=401)</code></span></h3><p>The <code>netskope_api_token</code> is missing, expired, or lacks publisher<br>read scope. Mint a fresh token in the Netskope admin console (Settings<br>→ Tools → REST API v2) with read+write on <code>/infrastructure/publishers</code>.</p>
+<h3><span id="error-list-publishers-failed-status404"><code>Error: List publishers failed (status=404)</code></span></h3><p><code>netskope_tenant_url</code> is wrong. Confirm by hitting the URL in a browser<br>— you should see the admin console login page.</p>
+<h3><span id="error-create-publisher-failed-status409"><code>Error: Create publisher ... failed (status=409)</code></span></h3><p>A publisher with that name already exists but the list endpoint didn’t<br>return it. Usually means your token can read some publishers but not all.<br>Use a token with tenant-wide visibility.</p>
+<h2><span id="vm-provisioning-failures">VM provisioning failures</span></h2><h3><span id="error-status-400-invalidamiidnotfound"><code>Error: status 400 ... InvalidAMIID.NotFound</code></span></h3><p>The AMI lookup found nothing. Either the calling identity lacks<br><code>ec2:DescribeImages</code>, or the Netskope AMI isn’t available in your<br>region. Pass <code>ami_id</code> explicitly to override.</p>
+<h3><span id="azure-error-building-account-aadsts700038">Azure: <code>Error: building account: ... AADSTS700038</code></span></h3><p>Your <code>azurerm</code> provider config is using invalid Service Principal<br>credentials. Even <code>terraform plan</code> requires valid auth — see<br><a href="/terraform-netskope-publisher/admin/operations/secret-handling/">Secret handling</a>.</p>
+<h2><span id="cloud-init-x2f-wizard-failures">Cloud-init &#x2F; wizard failures</span></h2><h3><span id="publisher-never-goes-online">Publisher never goes Online</span></h3><p><strong>Most common cause: no outbound 443.</strong> The wizard runs at first boot<br>but can’t reach Netskope’s gateways. Check the VM’s subnet has either:</p>
+<ul>
+<li>A <code>0.0.0.0/0 → igw-...</code> route AND the VM has a public IP<br>(<code>associate_public_ip_address = true</code>), or</li>
+<li>A <code>0.0.0.0/0 → nat-...</code> route via a NAT gateway.</li>
+</ul>
+<p>If neither is true, the publisher will never register no matter what<br>the wizard does. The full per-platform recipe (AWS, Azure, GCP,<br>vSphere) with HCL examples lives at<br><a href="/terraform-netskope-publisher/admin/concepts/connectivity/">Connectivity requirements</a>.</p>
+<p>SSH in and inspect cloud-init logs. Use the user you configured —<br><code>&lt;install_user&gt;</code> (default <code>ubuntu</code>):</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ssh -i ~/.ssh/your-key.pem &lt;install_user&gt;@&lt;public-ip&gt;</span><br><span class="line"><span class="built_in">sudo</span> journalctl -u cloud-final --no-pager | <span class="built_in">tail</span> -100</span><br><span class="line"><span class="built_in">sudo</span> <span class="built_in">cat</span> /var/log/cloud-init-output.log | <span class="built_in">tail</span> -100</span><br></pre></td></tr></table></figure>
+
+<p>Common causes:</p>
+<table>
+<thead>
+<tr>
+<th>Symptom in logs</th>
+<th>Likely cause</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Could not connect to gateway-...</code></td>
+<td>Egress to TCP&#x2F;443 blocked.</td>
+</tr>
+<tr>
+<td><code>Authentication failed</code> from wizard</td>
+<td>Token already consumed (re-applied without rotating).</td>
+</tr>
+<tr>
+<td><code>npa_publisher_wizard: command not found</code></td>
+<td>Wrong image or wrong <code>wizard_path</code>. In bootstrap mode, <code>bootstrap.sh</code> failed before installing the wizard — read further up in <code>cloud-init-output.log</code>.</td>
+</tr>
+</tbody></table>
+<h3><span id="bootstrap-mode-failures-v23">Bootstrap-mode failures (v2.3+)</span></h3><p>When <code>bootstrap = true</code>, cloud-init runs Netskope’s <code>bootstrap.sh</code> before<br>the registration step. Failures in the script abort the whole runcmd.<br>Where to look:</p>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Where to check</th>
+<th>Likely cause</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Cloud-init exits with non-zero status</td>
+<td><code>sudo cloud-init status --long</code> and <code>/var/log/cloud-init-output.log</code></td>
+<td><code>bootstrap.sh</code> failed; read the script’s stderr in <code>cloud-init-output.log</code>.</td>
+</tr>
+<tr>
+<td><code>curl: (6) Could not resolve host: s3-us-west-2.amazonaws.com</code></td>
+<td><code>cloud-init-output.log</code></td>
+<td>DNS or egress is broken before the script could download. Verify the VM has working DNS and egress to <code>*.amazonaws.com</code>.</td>
+</tr>
+<tr>
+<td><code>curl: (28) Operation timed out</code></td>
+<td><code>cloud-init-output.log</code></td>
+<td>Egress to the bootstrap S3 bucket blocked. Override <code>bootstrap_url</code> to point at a private mirror, or open egress to <code>s3-us-west-2.amazonaws.com:443</code>.</td>
+</tr>
+<tr>
+<td><code>dpkg: error: dpkg status database is locked</code></td>
+<td><code>cloud-init-output.log</code></td>
+<td>Another apt process is racing <code>bootstrap.sh</code>. v2.3 disables <code>package_update</code>; if you’ve re-added it (or have a snap-refresh timer firing), drop it.</td>
+</tr>
+<tr>
+<td><code>Permission denied</code> writing <code>/tmp</code></td>
+<td><code>cloud-init-output.log</code></td>
+<td><code>chmod 1777 /tmp</code> didn’t run; check the cloud-init runcmd ordering wasn’t customised.</td>
+</tr>
+</tbody></table>
+<h3><span id="~resourcesnonat-missing"><code>~/resources/.nonat</code> missing</span></h3><p>If you set <code>nonat = true</code> but the Publisher still SNATs traffic, confirm<br>the marker file landed before the Publisher service started:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">ls</span> -la /home/&lt;install_user&gt;/resources/.nonat</span><br><span class="line"><span class="built_in">sudo</span> systemctl status npa_publisher_service</span><br></pre></td></tr></table></figure>
+
+<p>The cloud-init runcmd creates <code>.nonat</code> <em>before</em> the bootstrap step, so by<br>the time the Publisher service first runs, the marker is in place. If the<br>file is missing, check <code>/var/log/cloud-init-output.log</code> for the <code>install</code><br>command that should have created it.</p>
+<h3><span id="i-deleted-the-ubuntu-user-and-now-im-locked-out">“I deleted the ubuntu user and now I’m locked out”</span></h3><p>When <code>install_user != &quot;ubuntu&quot;</code> and <code>delete_default_user = true</code> (the<br>default), cloud-init runs <code>userdel -r ubuntu</code> on first boot. Any SSH<br>session you opened as <code>ubuntu</code> before that is killed; subsequent logins<br>must use <code>install_user</code>. If you accidentally lost the install user’s<br>private key, the only recovery is reprovisioning the VM (cloud images<br>typically don’t ship serial-console password access).</p>
+<h3><span id="i-cant-sudo-as-my-new-install_user">“I can’t <code>sudo</code> as my new install_user”</span></h3><p>The cloud-init template grants the install user <code>NOPASSWD: ALL</code> via the<br><code>users:</code> directive, so <code>sudo</code> should always work. If it doesn’t:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> grep -r <span class="string">&#x27;&lt;install_user&gt;&#x27;</span> /etc/sudoers.d/ /etc/sudoers</span><br></pre></td></tr></table></figure>
+
+<p>If the entry is missing, cloud-init’s <code>users</code> module didn’t run —<br>inspect <code>cloud-init.log</code> and <code>cloud-init-output.log</code> for module errors<br>earlier in the boot.</p>
+<h2><span id="reaching-out">Reaching out</span></h2><ul>
+<li>File an issue on the <a target="_blank" rel="noopener" href="https://github.com/johnneerdael/terraform-netskope-publisher/issues">GitHub repo</a>.</li>
+<li>Include: platform, module version, <code>terraform version</code>, the redacted error.</li>
+</ul>
+
+        
+  </div>
+</article>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2026
+    John Neerdael
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/terraform-netskope-publisher/">Home</a></li><!--
+     --><!--
+       --><li><a href="/terraform-netskope-publisher/starter/">starter</a></li><!--
+     --><!--
+       --><li><a href="/terraform-netskope-publisher/admin/">admin</a></li><!--
+     --><!--
+       --><li><a href="/terraform-netskope-publisher/reference/">reference</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/johnneerdael/terraform-netskope-publisher">github</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+
+<script src="/terraform-netskope-publisher/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+<footer class="version-footer" style="text-align:center; padding:1rem 0; opacity:0.6; font-size:0.85rem;">Applies to terraform-netskope-publisher v2.x</footer></body>
+</html>

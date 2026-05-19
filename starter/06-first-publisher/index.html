@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="⏱ ~10 min including instance boot time.  Create a fresh working directory anywhere on disk: macOS Windows1mkdir ~&#x2F;npa-publisher-starter &amp;&amp; cd ~&#x2F;npa-publisher-starter12mkdir $HOME\npa-publishe">
+<meta property="og:type" content="website">
+<meta property="og:title" content="6. Your first publisher">
+<meta property="og:url" content="https://johnneerdael.github.io/terraform-netskope-publisher/starter/06-first-publisher">
+<meta property="og:site_name" content="terraform-netskope-publisher">
+<meta property="og:description" content="⏱ ~10 min including instance boot time.  Create a fresh working directory anywhere on disk: macOS Windows1mkdir ~&#x2F;npa-publisher-starter &amp;&amp; cd ~&#x2F;npa-publisher-starter12mkdir $HOME\npa-publishe">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-05-17T22:00:00.000Z">
+<meta property="article:modified_time" content="2026-05-19T19:03:19.804Z">
+<meta property="article:author" content="John Neerdael">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/terraform-netskope-publisher/images/netskope-favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/terraform-netskope-publisher/images/netskope-favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/terraform-netskope-publisher/images/netskope-apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>6. Your first publisher</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/terraform-netskope-publisher/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+    <div class="content index py4 ">
+        
+          <header id="header">
+  <a class="u-url u-uid" href="/terraform-netskope-publisher/">
+  
+    
+      <img id="logo" alt class="u-logo" src="/terraform-netskope-publisher/images/netskope-logo.png" />
+    
+  
+    <div id="title">
+      <h1 class="p-name">terraform-netskope-publisher</h1>
+    </div>
+  </a>
+  <div id="nav">
+    <ul>
+      <li class="icon">
+        <a href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-2x"></i></a>
+      </li>
+      <!--
+     --><li><a href="/terraform-netskope-publisher/">Home</a></li><!--
+   --><!--
+     --><li><a href="/terraform-netskope-publisher/starter/">starter</a></li><!--
+   --><!--
+     --><li><a href="/terraform-netskope-publisher/admin/">admin</a></li><!--
+   --><!--
+     --><li><a href="/terraform-netskope-publisher/reference/">reference</a></li><!--
+   --><!--
+     --><li><a target="_blank" rel="noopener" href="https://github.com/johnneerdael/terraform-netskope-publisher">github</a></li><!--
+   -->
+    </ul>
+  </div>
+</header>
+
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  
+
+  <div class="content" itemprop="articleBody">
+      
+          <blockquote>
+<p>⏱ ~10 min including instance boot time.</p>
+</blockquote>
+<p>Create a fresh working directory anywhere on disk:</p>
+<div class="content_tabs"><a href="#macos" class="on" role="tab">macOS</a>
+<a href="#windows" class="false" role="tab">Windows</a></div><div id="macos" data-tab-title="macOS" class="content_tab"><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> ~/npa-publisher-starter &amp;&amp; <span class="built_in">cd</span> ~/npa-publisher-starter</span><br></pre></td></tr></table></figure></div><div id="windows" data-tab-title="Windows" class="content_tab"><figure class="highlight pwsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir <span class="variable">$HOME</span>\npa<span class="literal">-publisher-starter</span></span><br><span class="line"><span class="built_in">cd</span> <span class="variable">$HOME</span>\npa<span class="literal">-publisher-starter</span></span><br></pre></td></tr></table></figure></div>
+
+<p>Create <code>main.tf</code> with this content (replace the three <code>subnet_id</code>,<br><code>security_group_ids</code>, and <code>key_name</code> values with the IDs you collected<br>in step 3):</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">terraform &#123;</span><br><span class="line">  required_version = &quot;&gt;= 1.7&quot;</span><br><span class="line">  required_providers &#123;</span><br><span class="line">    aws       = &#123; source = &quot;hashicorp/aws&quot;,       version = &quot;~&gt; 5.0&quot; &#125;</span><br><span class="line">    http      = &#123; source = &quot;hashicorp/http&quot;,      version = &quot;&gt;= 3.4&quot; &#125;</span><br><span class="line">    cloudinit = &#123; source = &quot;hashicorp/cloudinit&quot;, version = &quot;&gt;= 2.3&quot; &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">provider &quot;aws&quot; &#123;</span><br><span class="line">  region = &quot;eu-west-1&quot;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">variable &quot;netskope_tenant_url&quot; &#123;</span><br><span class="line">  type = string</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">variable &quot;netskope_api_token&quot; &#123;</span><br><span class="line">  type      = string</span><br><span class="line">  sensitive = true</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module &quot;publisher&quot; &#123;</span><br><span class="line">  source  = &quot;johnneerdael/publisher/netskope//modules/aws&quot;</span><br><span class="line">  version = &quot;~&gt; 2.3&quot;</span><br><span class="line"></span><br><span class="line">  name_prefix = &quot;my-first-publisher&quot;</span><br><span class="line">  replicas    = 1</span><br><span class="line"></span><br><span class="line">  tenant_url = var.netskope_tenant_url</span><br><span class="line">  api_token  = var.netskope_api_token</span><br><span class="line"></span><br><span class="line">  subnet_id          = &quot;subnet-REPLACE-ME&quot;</span><br><span class="line">  security_group_ids = [&quot;sg-REPLACE-ME&quot;]</span><br><span class="line">  key_name           = &quot;npa-publisher-key&quot;</span><br><span class="line"></span><br><span class="line">  # v2.3: boot a stock Canonical Ubuntu 22.04 LTS Minimal AMI and install</span><br><span class="line">  # the Publisher via Netskope&#x27;s bootstrap.sh during cloud-init. No</span><br><span class="line">  # marketplace subscription needed. Set bootstrap = false (and pass</span><br><span class="line">  # ami_id) to use a pre-baked Netskope Publisher AMI instead.</span><br><span class="line">  bootstrap = true</span><br><span class="line"></span><br><span class="line">  # The starter assumes a public subnet. If your subnet has NAT instead,</span><br><span class="line">  # drop this line.</span><br><span class="line">  associate_public_ip_address = true</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">output &quot;publishers&quot; &#123;</span><br><span class="line">  value     = module.publisher.publishers</span><br><span class="line">  sensitive = true</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Initialize Terraform (downloads the module and providers):</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">terraform init</span><br></pre></td></tr></table></figure>
+
+<p>Show what will happen:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">terraform plan</span><br></pre></td></tr></table></figure>
+
+<p>You should see roughly +5 resources (one publisher record via the<br>Netskope API, one EC2 instance, plus internal data sources).</p>
+<p>Apply:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">terraform apply</span><br></pre></td></tr></table></figure>
+
+<p>Type <code>yes</code> when prompted. The EC2 instance boots in about 2 minutes, but<br>because <code>bootstrap = true</code> makes cloud-init download and install the<br>Publisher software on first boot, <strong>registration takes ~5–10 minutes<br>total</strong>. The Netskope console will show the publisher Offline at first,<br>then Online once <code>bootstrap.sh</code> finishes and the wizard runs.</p>
+<p>If you’d rather skip the bootstrap step, set <code>bootstrap = false</code> and<br>provide <code>ami_id = &quot;ami-...&quot;</code> pointing at a pre-baked Netskope Publisher<br>AMI — registration then completes within ~2 minutes of <code>apply</code>.</p>
+<p>Next → <a href="/terraform-netskope-publisher/starter/07-verify-online/">Verify it’s online</a></p>
+
+        
+  </div>
+</article>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2026
+    John Neerdael
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/terraform-netskope-publisher/">Home</a></li><!--
+     --><!--
+       --><li><a href="/terraform-netskope-publisher/starter/">starter</a></li><!--
+     --><!--
+       --><li><a href="/terraform-netskope-publisher/admin/">admin</a></li><!--
+     --><!--
+       --><li><a href="/terraform-netskope-publisher/reference/">reference</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/johnneerdael/terraform-netskope-publisher">github</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+
+<script src="/terraform-netskope-publisher/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+<nav class="page-nav" style="display:flex;justify-content:space-between;gap:1rem;margin:3rem 0 2rem;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.1)"><a href="/terraform-netskope-publisher/starter/05-configure-shell/" style="flex:1;padding:0.75rem 1rem;border:1px solid rgba(255,255,255,0.2);border-radius:6px;text-decoration:none;color:inherit;font-size:0.95rem;line-height:1.3;transition:border-color 0.15s"><span style="opacity:0.6;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;">← Previous</span><span style="display:block;margin-top:0.25rem;">5. Configure your shell</span></a><a href="/terraform-netskope-publisher/starter/07-verify-online/" style="flex:1;padding:0.75rem 1rem;border:1px solid rgba(255,255,255,0.2);border-radius:6px;text-decoration:none;color:inherit;font-size:0.95rem;line-height:1.3;transition:border-color 0.15s;text-align:right"><span style="opacity:0.6;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;">Next →</span><span style="display:block;margin-top:0.25rem;">7. Verify it's online</span></a></nav><footer class="version-footer" style="text-align:center; padding:1rem 0; opacity:0.6; font-size:0.85rem;">Applies to terraform-netskope-publisher v2.x</footer></body>
+</html>

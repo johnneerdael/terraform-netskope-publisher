@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="The publisher VM must be able to make outbound TCP connections tothe Netskope regional gateway infrastructure (HTTPS &#x2F; TCP 443). Withoutthat, the wizard runs at first boot but can’t register, and">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Connectivity requirements">
+<meta property="og:url" content="https://johnneerdael.github.io/terraform-netskope-publisher/admin/concepts/connectivity">
+<meta property="og:site_name" content="terraform-netskope-publisher">
+<meta property="og:description" content="The publisher VM must be able to make outbound TCP connections tothe Netskope regional gateway infrastructure (HTTPS &#x2F; TCP 443). Withoutthat, the wizard runs at first boot but can’t register, and">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-05-17T22:00:00.000Z">
+<meta property="article:modified_time" content="2026-05-19T19:03:19.802Z">
+<meta property="article:author" content="John Neerdael">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/terraform-netskope-publisher/images/netskope-favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/terraform-netskope-publisher/images/netskope-favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/terraform-netskope-publisher/images/netskope-apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Connectivity requirements</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/terraform-netskope-publisher/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+    <div class="content index py4 ">
+        
+          <header id="header">
+  <a class="u-url u-uid" href="/terraform-netskope-publisher/">
+  
+    
+      <img id="logo" alt class="u-logo" src="/terraform-netskope-publisher/images/netskope-logo.png" />
+    
+  
+    <div id="title">
+      <h1 class="p-name">terraform-netskope-publisher</h1>
+    </div>
+  </a>
+  <div id="nav">
+    <ul>
+      <li class="icon">
+        <a href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-2x"></i></a>
+      </li>
+      <!--
+     --><li><a href="/terraform-netskope-publisher/">Home</a></li><!--
+   --><!--
+     --><li><a href="/terraform-netskope-publisher/starter/">starter</a></li><!--
+   --><!--
+     --><li><a href="/terraform-netskope-publisher/admin/">admin</a></li><!--
+   --><!--
+     --><li><a href="/terraform-netskope-publisher/reference/">reference</a></li><!--
+   --><!--
+     --><li><a target="_blank" rel="noopener" href="https://github.com/johnneerdael/terraform-netskope-publisher">github</a></li><!--
+   -->
+    </ul>
+  </div>
+</header>
+
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  
+
+  <div class="content" itemprop="articleBody">
+      
+          <p>The publisher VM <strong>must</strong> be able to make outbound TCP connections to<br>the Netskope regional gateway infrastructure (HTTPS &#x2F; TCP 443). Without<br>that, the wizard runs at first boot but can’t register, and the<br>publisher stays Offline forever — no matter how many <code>terraform apply</code><br>runs you do.</p>
+<p>This page collects the supported ways to give the VM that egress, per<br>platform, with the minimum HCL.</p>
+<h2><span id="universal-requirement">Universal requirement</span></h2><table>
+<thead>
+<tr>
+<th>Direction</th>
+<th>Protocol</th>
+<th>Destination</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Egress</td>
+<td>TCP 443</td>
+<td>Netskope regional gateways (see your tenant for FQDNs &#x2F; ranges)</td>
+<td>Publisher ↔ Netskope control + data plane</td>
+</tr>
+<tr>
+<td>Egress</td>
+<td>TCP 443</td>
+<td>Netskope NPA API host (your tenant URL)</td>
+<td>Wizard’s initial enrollment call</td>
+</tr>
+</tbody></table>
+<p>The source IP does <strong>not</strong> need to be static.</p>
+<blockquote>
+<p>The Terraform run also needs to reach <code>tenant_url</code> from wherever you<br>run <code>terraform plan/apply</code> (CI runner, laptop). That’s a separate<br>network path — don’t confuse it with the publisher’s egress.</p>
+</blockquote>
+<h2><span id="aws">AWS</span></h2><p><code>modules/aws</code> exposes one toggle: <strong><code>associate_public_ip_address</code></strong>.<br>Whether you set it depends on the subnet:</p>
+<table>
+<thead>
+<tr>
+<th>Subnet type</th>
+<th><code>0.0.0.0/0</code> route</th>
+<th>Set <code>associate_public_ip_address</code> to</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Public</strong></td>
+<td><code>igw-...</code></td>
+<td><code>true</code></td>
+<td>Simplest. Publisher gets a free auto-assigned public IPv4. SSH access also becomes possible.</td>
+</tr>
+<tr>
+<td><strong>Private with NAT</strong></td>
+<td><code>nat-...</code></td>
+<td><code>false</code> (default)</td>
+<td>NAT gateway is per-hour + per-GB billed (~$0.045&#x2F;hr base in <code>us-east-1</code> as of writing).</td>
+</tr>
+<tr>
+<td><strong>Private, transit-routed</strong></td>
+<td>Custom (TGW &#x2F; VPN &#x2F; DX)</td>
+<td><code>false</code></td>
+<td>Egress goes through your hub. Make sure return traffic for 443 isn’t dropped.</td>
+</tr>
+</tbody></table>
+<p>Minimal example (public subnet path):</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">module &quot;publisher&quot; &#123;</span><br><span class="line">  source = &quot;github.com/johnneerdael/terraform-netskope-publisher//modules/aws?ref=v2.0.0&quot;</span><br><span class="line"></span><br><span class="line">  tenant_url = var.netskope_tenant_url</span><br><span class="line">  api_token  = var.netskope_api_token</span><br><span class="line"></span><br><span class="line">  subnet_id          = var.subnet_id</span><br><span class="line">  security_group_ids = [var.security_group_id]</span><br><span class="line">  key_name           = var.key_name</span><br><span class="line"></span><br><span class="line">  associate_public_ip_address = true   # public subnet</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Minimal example (private subnet with NAT — drop the line):</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">module &quot;publisher&quot; &#123;</span><br><span class="line">  source = &quot;github.com/johnneerdael/terraform-netskope-publisher//modules/aws?ref=v2.0.0&quot;</span><br><span class="line"></span><br><span class="line">  tenant_url = var.netskope_tenant_url</span><br><span class="line">  api_token  = var.netskope_api_token</span><br><span class="line"></span><br><span class="line">  subnet_id          = var.private_subnet_id     # subnet whose RT points at NAT</span><br><span class="line">  security_group_ids = [var.security_group_id]</span><br><span class="line">  key_name           = var.key_name</span><br><span class="line">  # associate_public_ip_address omitted → defaults to false; egress via NAT</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>The module never creates the VPC, IGW, NAT gateway, or routes — those<br>are your responsibility. To verify: in the AWS console, open<br><em>VPC → Subnets → your subnet → Route Table</em> and check the <code>0.0.0.0/0</code><br>target.</p>
+<h3><span id="ssh-access-on-private-subnets">SSH access on private subnets</span></h3><p>If you went with NAT (no public IP), the VM has no inbound path either.<br>Reach it via Session Manager (requires the <code>AmazonSSMManagedInstanceCore</code><br>managed policy attached via <code>iam_instance_profile</code>), or via a bastion in<br>a public subnet.</p>
+<h2><span id="azure">Azure</span></h2><p><code>modules/azure</code> exposes <strong><code>assign_public_ip</code></strong> (Standard PIP, attached<br>at the NIC).</p>
+<table>
+<thead>
+<tr>
+<th>Subnet shape</th>
+<th>Set <code>assign_public_ip</code> to</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Standard public IP per VM</strong></td>
+<td><code>true</code></td>
+<td>Simplest. Creates one <code>azurerm_public_ip</code> per replica.</td>
+</tr>
+<tr>
+<td><strong>Subnet attached to a NAT gateway</strong></td>
+<td><code>false</code> (default)</td>
+<td>Recommended at scale — NAT gateways are cheaper per flow than per-VM PIPs. Configure the NAT gateway separately and associate it with the subnet.</td>
+</tr>
+<tr>
+<td><strong>Behind Azure Firewall &#x2F; NVA</strong></td>
+<td><code>false</code></td>
+<td>Route table on the subnet points <code>0.0.0.0/0</code> at the firewall private IP. Make sure the firewall allows 443 outbound.</td>
+</tr>
+</tbody></table>
+<p>Minimal example (public IP path):</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">module &quot;publisher&quot; &#123;</span><br><span class="line">  source = &quot;github.com/johnneerdael/terraform-netskope-publisher//modules/azure?ref=v2.0.0&quot;</span><br><span class="line"></span><br><span class="line">  tenant_url = var.netskope_tenant_url</span><br><span class="line">  api_token  = var.netskope_api_token</span><br><span class="line"></span><br><span class="line">  resource_group_name  = var.resource_group_name</span><br><span class="line">  location             = var.location</span><br><span class="line">  subnet_id            = var.subnet_id</span><br><span class="line">  admin_ssh_public_key = file(&quot;~/.ssh/id_rsa.pub&quot;)</span><br><span class="line">  image_id             = var.image_id</span><br><span class="line"></span><br><span class="line">  assign_public_ip = true</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2><span id="gcp">GCP</span></h2><blockquote>
+<p><strong>GCP’s default 1460-byte MTU</strong> is lower than the 1500-byte default that<br>the Linux masquerade + conntrack path assumes. To avoid fragmented or<br>dropped packets at the publisher, Netskope recommends running the<br>Publisher in <strong>No-NAT mode</strong> on GCP: traffic is proxied directly from<br>the egress NIC instead of being SNAT’d. <code>modules/gcp</code> defaults<br><code>nonat = true</code>, which drops an empty <code>~install_user/resources/.nonat</code><br>file during cloud-init. The Publisher service detects the marker on<br>startup and switches into No-NAT mode. Set <code>nonat = false</code> only if you<br>have a specific reason to revert.</p>
+</blockquote>
+<p><code>modules/gcp</code> exposes <strong><code>assign_public_ip</code></strong> which controls whether the<br>instance gets an <code>access_config &#123;&#125;</code> block (external IPv4).</p>
+<table>
+<thead>
+<tr>
+<th>Connectivity shape</th>
+<th>Set <code>assign_public_ip</code> to</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Ephemeral external IP</strong></td>
+<td><code>true</code></td>
+<td>Simplest. Free, but the IP changes on stop&#x2F;start.</td>
+</tr>
+<tr>
+<td><strong>Cloud NAT on the subnet’s region+VPC</strong></td>
+<td><code>false</code> (default)</td>
+<td>Recommended for fleets. Cloud NAT is regional and shared.</td>
+</tr>
+<tr>
+<td><strong>Private connectivity (PSC &#x2F; Interconnect)</strong></td>
+<td><code>false</code></td>
+<td>Whatever you have in place — Cloud NAT is the common case.</td>
+</tr>
+</tbody></table>
+<p>Minimal example (Cloud NAT path):</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">module &quot;publisher&quot; &#123;</span><br><span class="line">  source = &quot;github.com/johnneerdael/terraform-netskope-publisher//modules/gcp?ref=v2.0.0&quot;</span><br><span class="line"></span><br><span class="line">  tenant_url = var.netskope_tenant_url</span><br><span class="line">  api_token  = var.netskope_api_token</span><br><span class="line"></span><br><span class="line">  project    = var.project</span><br><span class="line">  zone       = var.zone</span><br><span class="line">  network    = var.network          # has a Cloud NAT attached to its region</span><br><span class="line">  subnetwork = var.subnetwork</span><br><span class="line">  image      = var.image</span><br><span class="line">  # assign_public_ip omitted → defaults to false; egress via Cloud NAT</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2><span id="hyper-v">Hyper-V</span></h2><p><code>modules/hyperv</code> requires only a virtual switch (<code>vswitch_name</code>) and a<br>host that can reach the public internet on TCP&#x2F;443.</p>
+<table>
+<thead>
+<tr>
+<th>Switch type</th>
+<th>Outbound 443 reachable?</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>External (bridged to a NIC with internet)</strong></td>
+<td>Yes — same as the host</td>
+<td>Most common in labs and small deployments.</td>
+</tr>
+<tr>
+<td><strong>Internal (host + VMs only)</strong></td>
+<td>No</td>
+<td>The publisher cannot register. Add NAT on the host or use an External switch.</td>
+</tr>
+<tr>
+<td><strong>Private (VMs only)</strong></td>
+<td>No</td>
+<td>Same as Internal.</td>
+</tr>
+</tbody></table>
+<p>Minimal example:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">module &quot;publisher&quot; &#123;</span><br><span class="line">  source = &quot;github.com/johnneerdael/terraform-netskope-publisher//modules/hyperv?ref=v2.1.0&quot;</span><br><span class="line"></span><br><span class="line">  tenant_url = var.netskope_tenant_url</span><br><span class="line">  api_token  = var.netskope_api_token</span><br><span class="line"></span><br><span class="line">  vswitch_name = &quot;External vSwitch&quot;</span><br><span class="line"></span><br><span class="line">  hyperv_winrm_config = &#123;</span><br><span class="line">    host     = &quot;hyperv01.lab.local&quot;</span><br><span class="line">    user     = &quot;Administrator&quot;</span><br><span class="line">    password = var.hyperv_password</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Additional considerations:</p>
+<ul>
+<li><strong>Host firewall</strong> (Windows Defender Firewall): the host needs outbound<br>443 to <code>s3-us-west-2.amazonaws.com</code> for the VHDX download and the<br>Netskope tenant URL.</li>
+<li><strong>WinRM</strong> (5985 HTTP or 5986 HTTPS) must be reachable from wherever<br>you run Terraform.</li>
+<li><strong>DNS on the VM</strong>: by default it uses the vswitch’s DHCP-assigned<br>DNS. If you use an internal-only DNS, make sure it can resolve public<br>Netskope hostnames or the publisher won’t register.</li>
+<li><strong>VLANs</strong>: set <code>vlan_id</code> on the module to tag the publisher NIC.</li>
+</ul>
+<h2><span id="kubernetes">Kubernetes</span></h2><p><code>modules/kubernetes</code> installs the publisher chart into whatever cluster<br>the caller’s <code>helm</code> + <code>kubernetes</code> providers point at. The Pods need<br>outbound TCP&#x2F;443 to:</p>
+<ul>
+<li>Your Netskope tenant URL (registration in api mode; ongoing publisher↔gateway traffic always).</li>
+<li>Docker Hub at <code>index.docker.io</code> for the<br><code>netskopeprivateaccess/publisher_u22</code> image — override<br><code>image_repository</code> to point at a private mirror if Docker Hub is<br>unreachable.</li>
+</ul>
+<h3><span id="networkpolicies">NetworkPolicies</span></h3><p>If the namespace has a default-deny egress NetworkPolicy, add an<br>explicit allow for TCP&#x2F;443 from the publisher Pods (selectors per the<br>chart’s standard labels).</p>
+<h3><span id="egress-through-an-http-proxy">Egress through an HTTP proxy</span></h3><p>The chart accepts <code>HTTPS_PROXY</code> &#x2F; <code>HTTP_PROXY</code> &#x2F; <code>NO_PROXY</code> env vars on<br>the publisher container via the <code>extraEnv</code> values key. Wire those into<br><code>chart_values</code> if your cluster’s egress is proxied.</p>
+<h3><span id="chart-pull">Chart pull</span></h3><p><code>oci://ghcr.io/johnneerdael/charts/kubernetes-netskope-publisher</code> is<br>publicly readable. Air-gapped clusters need to mirror the OCI artifact<br>and set <code>chart_repository</code> to point at the mirror.</p>
+<h2><span id="vsphere">vSphere</span></h2><p>There’s no module input for egress — the VM inherits its network’s<br>routing, which is fully on you. Two practical checks:</p>
+<ol>
+<li><strong>Layer-3 reachability</strong>: from the VM (post-boot), <code>curl -v https://&lt;tenant&gt;.goskope.com/</code><br>should succeed. If your network does egress filtering, an explicit<br>firewall rule allowing TCP&#x2F;443 from the publisher subnet to the<br>Netskope regional gateways is required.</li>
+<li><strong>DNS</strong>: the wizard resolves Netskope hostnames at boot. Make sure<br>the VM’s DNS (via DHCP or static config) can resolve public names —<br>internal-only DNS won’t cut it unless it forwards.</li>
+</ol>
+<p>If your environment uses an explicit HTTP&#x2F;HTTPS proxy, configure it via<br>cloud-init’s <code>runcmd</code> or by baking proxy env vars into the template;<br>the module does not currently surface proxy settings as inputs (track<br>in <a href="/terraform-netskope-publisher/reference/roadmap/">Roadmap</a>).</p>
+<h2><span id="verifying">Verifying</span></h2><p>Once the VM is up, from inside it (or via Session Manager &#x2F; bastion):</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Layer-3 reachability check</span></span><br><span class="line">curl --max-time 10 -sS -o /dev/null -w <span class="string">&quot;%&#123;http_code&#125;\n&quot;</span> https://&lt;your-tenant&gt;.goskope.com/</span><br></pre></td></tr></table></figure>
+
+<p>A <code>200</code>, <code>301</code>, or <code>403</code> from <code>goskope.com</code> means TCP&#x2F;443 + DNS work.<br>A timeout or refusal means egress is blocked — fix that before<br>re-running the wizard.</p>
+<p>See also: <a href="/terraform-netskope-publisher/admin/operations/troubleshooting/">Troubleshooting</a>.</p>
+
+        
+  </div>
+</article>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2026
+    John Neerdael
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/terraform-netskope-publisher/">Home</a></li><!--
+     --><!--
+       --><li><a href="/terraform-netskope-publisher/starter/">starter</a></li><!--
+     --><!--
+       --><li><a href="/terraform-netskope-publisher/admin/">admin</a></li><!--
+     --><!--
+       --><li><a href="/terraform-netskope-publisher/reference/">reference</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/johnneerdael/terraform-netskope-publisher">github</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+
+<script src="/terraform-netskope-publisher/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+<footer class="version-footer" style="text-align:center; padding:1rem 0; opacity:0.6; font-size:0.85rem;">Applies to terraform-netskope-publisher v2.x</footer></body>
+</html>

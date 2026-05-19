@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="⏱ ~2 min · Open the Netskope admin console.  In the admin console: Settings → Security Cloud Platform → NetskopePrivate Access → Publishers. You should see your publisher (named my-first-publisher-1)">
+<meta property="og:type" content="website">
+<meta property="og:title" content="7. Verify it&#39;s online">
+<meta property="og:url" content="https://johnneerdael.github.io/terraform-netskope-publisher/starter/07-verify-online">
+<meta property="og:site_name" content="terraform-netskope-publisher">
+<meta property="og:description" content="⏱ ~2 min · Open the Netskope admin console.  In the admin console: Settings → Security Cloud Platform → NetskopePrivate Access → Publishers. You should see your publisher (named my-first-publisher-1)">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-05-17T22:00:00.000Z">
+<meta property="article:modified_time" content="2026-05-19T19:03:19.804Z">
+<meta property="article:author" content="John Neerdael">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/terraform-netskope-publisher/images/netskope-favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/terraform-netskope-publisher/images/netskope-favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/terraform-netskope-publisher/images/netskope-apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>7. Verify it&#39;s online</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/terraform-netskope-publisher/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+    <div class="content index py4 ">
+        
+          <header id="header">
+  <a class="u-url u-uid" href="/terraform-netskope-publisher/">
+  
+    
+      <img id="logo" alt class="u-logo" src="/terraform-netskope-publisher/images/netskope-logo.png" />
+    
+  
+    <div id="title">
+      <h1 class="p-name">terraform-netskope-publisher</h1>
+    </div>
+  </a>
+  <div id="nav">
+    <ul>
+      <li class="icon">
+        <a href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-2x"></i></a>
+      </li>
+      <!--
+     --><li><a href="/terraform-netskope-publisher/">Home</a></li><!--
+   --><!--
+     --><li><a href="/terraform-netskope-publisher/starter/">starter</a></li><!--
+   --><!--
+     --><li><a href="/terraform-netskope-publisher/admin/">admin</a></li><!--
+   --><!--
+     --><li><a href="/terraform-netskope-publisher/reference/">reference</a></li><!--
+   --><!--
+     --><li><a target="_blank" rel="noopener" href="https://github.com/johnneerdael/terraform-netskope-publisher">github</a></li><!--
+   -->
+    </ul>
+  </div>
+</header>
+
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  
+
+  <div class="content" itemprop="articleBody">
+      
+          <blockquote>
+<p>⏱ ~2 min · Open the Netskope admin console.</p>
+</blockquote>
+<p>In the admin console: <strong>Settings → Security Cloud Platform → Netskope<br>Private Access → Publishers</strong>.</p>
+<p>You should see your publisher (named <code>my-first-publisher-1</code>) with a green<br><strong>Online</strong> indicator within 1–2 minutes of <code>terraform apply</code> finishing.</p>
+<h2><span id="finding-the-publishers-public-ip">Finding the publisher’s public IP</span></h2><p>The <code>publishers</code> output is <code>sensitive</code>, so <code>terraform output publishers</code><br>redacts it. Two ways to retrieve the IP:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># From Terraform state</span></span><br><span class="line">terraform state show <span class="string">&#x27;module.publisher.aws_instance.publisher[&quot;my-first-publisher-1&quot;]&#x27;</span> \</span><br><span class="line">  | grep public_ip</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Or via AWS CLI</span></span><br><span class="line">aws ec2 describe-instances \</span><br><span class="line">  --filters <span class="string">&quot;Name=tag:Name,Values=my-first-publisher-1&quot;</span> \</span><br><span class="line">  --query <span class="string">&#x27;Reservations[].Instances[].PublicIpAddress&#x27;</span> --output text</span><br></pre></td></tr></table></figure>
+
+<h2><span id="if-its-not-online-after-5-minutes">If it’s not Online after 5 minutes</span></h2><p>The single most common cause is <strong>no outbound Internet</strong> from the VM —<br>i.e., the subnet isn’t actually a public subnet (no IGW route) or<br>doesn’t have a NAT gateway. Revisit<br><a href="/terraform-netskope-publisher/starter/03-aws-account-prep/">step 3</a>.</p>
+<p>To inspect the wizard directly, grab the public IP (above), then:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ssh -i ~/Downloads/npa-publisher-key.pem ubuntu@&lt;public-ip&gt;</span><br><span class="line"><span class="built_in">sudo</span> journalctl -u cloud-final --no-pager | <span class="built_in">tail</span> -100</span><br><span class="line"><span class="built_in">sudo</span> <span class="built_in">cat</span> /var/log/cloud-init-output.log | <span class="built_in">tail</span> -50</span><br></pre></td></tr></table></figure>
+
+<p>A <code>Connection refused</code> &#x2F; <code>Connection timed out</code> from the wizard means<br>outbound is blocked. See the<br><a href="/terraform-netskope-publisher/admin/operations/troubleshooting/">Troubleshooting guide</a><br>for other failure modes.</p>
+<p>Next → <a href="/terraform-netskope-publisher/starter/08-tear-down/">Tear it down</a></p>
+
+        
+  </div>
+</article>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2026
+    John Neerdael
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/terraform-netskope-publisher/">Home</a></li><!--
+     --><!--
+       --><li><a href="/terraform-netskope-publisher/starter/">starter</a></li><!--
+     --><!--
+       --><li><a href="/terraform-netskope-publisher/admin/">admin</a></li><!--
+     --><!--
+       --><li><a href="/terraform-netskope-publisher/reference/">reference</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/johnneerdael/terraform-netskope-publisher">github</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+
+<script src="/terraform-netskope-publisher/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+<nav class="page-nav" style="display:flex;justify-content:space-between;gap:1rem;margin:3rem 0 2rem;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.1)"><a href="/terraform-netskope-publisher/starter/06-first-publisher/" style="flex:1;padding:0.75rem 1rem;border:1px solid rgba(255,255,255,0.2);border-radius:6px;text-decoration:none;color:inherit;font-size:0.95rem;line-height:1.3;transition:border-color 0.15s"><span style="opacity:0.6;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;">← Previous</span><span style="display:block;margin-top:0.25rem;">6. Your first publisher</span></a><a href="/terraform-netskope-publisher/starter/08-tear-down/" style="flex:1;padding:0.75rem 1rem;border:1px solid rgba(255,255,255,0.2);border-radius:6px;text-decoration:none;color:inherit;font-size:0.95rem;line-height:1.3;transition:border-color 0.15s;text-align:right"><span style="opacity:0.6;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;">Next →</span><span style="display:block;margin-top:0.25rem;">8. Tear it down</span></a></nav><footer class="version-footer" style="text-align:center; padding:1rem 0; opacity:0.6; font-size:0.85rem;">Applies to terraform-netskope-publisher v2.x</footer></body>
+</html>

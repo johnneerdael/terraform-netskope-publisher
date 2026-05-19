@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="ProblemYou have existing VPCs &#x2F; VNets &#x2F; VPC networks and don’t want this moduleto create or assume any networking primitives. SolutionThe module never creates VPCs, subnets, security groups,">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Bring your own networking">
+<meta property="og:url" content="https://johnneerdael.github.io/terraform-netskope-publisher/admin/how-to/byo-networking">
+<meta property="og:site_name" content="terraform-netskope-publisher">
+<meta property="og:description" content="ProblemYou have existing VPCs &#x2F; VNets &#x2F; VPC networks and don’t want this moduleto create or assume any networking primitives. SolutionThe module never creates VPCs, subnets, security groups,">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-05-17T22:00:00.000Z">
+<meta property="article:modified_time" content="2026-05-19T19:03:19.802Z">
+<meta property="article:author" content="John Neerdael">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/terraform-netskope-publisher/images/netskope-favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/terraform-netskope-publisher/images/netskope-favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/terraform-netskope-publisher/images/netskope-apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Bring your own networking</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/terraform-netskope-publisher/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+    <div class="content index py4 ">
+        
+          <header id="header">
+  <a class="u-url u-uid" href="/terraform-netskope-publisher/">
+  
+    
+      <img id="logo" alt class="u-logo" src="/terraform-netskope-publisher/images/netskope-logo.png" />
+    
+  
+    <div id="title">
+      <h1 class="p-name">terraform-netskope-publisher</h1>
+    </div>
+  </a>
+  <div id="nav">
+    <ul>
+      <li class="icon">
+        <a href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-2x"></i></a>
+      </li>
+      <!--
+     --><li><a href="/terraform-netskope-publisher/">Home</a></li><!--
+   --><!--
+     --><li><a href="/terraform-netskope-publisher/starter/">starter</a></li><!--
+   --><!--
+     --><li><a href="/terraform-netskope-publisher/admin/">admin</a></li><!--
+   --><!--
+     --><li><a href="/terraform-netskope-publisher/reference/">reference</a></li><!--
+   --><!--
+     --><li><a target="_blank" rel="noopener" href="https://github.com/johnneerdael/terraform-netskope-publisher">github</a></li><!--
+   -->
+    </ul>
+  </div>
+</header>
+
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  
+
+  <div class="content" itemprop="articleBody">
+      
+          <h2><span id="problem">Problem</span></h2><p>You have existing VPCs &#x2F; VNets &#x2F; VPC networks and don’t want this module<br>to create or assume any networking primitives.</p>
+<h2><span id="solution">Solution</span></h2><p>The module never creates VPCs, subnets, security groups, or routing<br>constructs. You pass references to existing ones via the per-platform<br>input object:</p>
+<table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>Networking inputs</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>AWS</td>
+<td><code>aws.subnet_id</code>, <code>aws.security_group_ids[]</code>, <code>aws.associate_public_ip_address</code></td>
+</tr>
+<tr>
+<td>Azure</td>
+<td><code>azure.subnet_id</code>, <code>azure.network_security_group_id</code>, <code>azure.assign_public_ip</code></td>
+</tr>
+<tr>
+<td>GCP</td>
+<td><code>gcp.network</code>, <code>gcp.subnetwork</code>, <code>gcp.assign_public_ip</code>, <code>gcp.network_tags[]</code></td>
+</tr>
+<tr>
+<td>vSphere</td>
+<td><code>vsphere.network_name</code></td>
+</tr>
+</tbody></table>
+<h2><span id="required-egress">Required egress</span></h2><p>The publisher needs outbound TCP&#x2F;443 to the Netskope regional gateway<br>infrastructure. The exact destination set depends on your tenant;<br>consult Netskope documentation for current FQDNs &#x2F; IP ranges.</p>
+<p>For per-platform recipes (public IP vs NAT gateway vs Cloud NAT vs<br>on-prem firewall) with working HCL, see<br><a href="/terraform-netskope-publisher/admin/concepts/connectivity/">Connectivity requirements</a>.</p>
+<h2><span id="optional-ingress">Optional ingress</span></h2><p>SSH (TCP&#x2F;22) from your operator subnet is useful for troubleshooting.<br>Not strictly required — the publisher does not accept inbound user<br>traffic on any port.</p>
+<h2><span id="guest-os-interface-override-guest_network_interface-v23">Guest-OS interface override (<code>guest_network_interface</code>, v2.3+)</span></h2><p>Separate from the cloud-side networking inputs above, you can override<br>the guest OS’s primary interface from cloud-init. This is useful for<br>static IP assignments inside vSphere &#x2F; Hyper-V templates, jumbo-frame<br>MTUs on AWS &#x2F; Azure, or pinning the MTU to 1460 on GCP without relying<br>on the image default.</p>
+<p><code>guest_network_interface</code> is a nullable object on <code>modules/aws</code>,<br><code>modules/azure</code>, and <code>modules/gcp</code>. When set, cloud-init drops<br><code>/etc/netplan/60-cloudinit-override.yaml</code> and runs <code>netplan apply</code> before<br>the Publisher install steps.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>name</code></td>
+<td>string</td>
+<td>—</td>
+<td>Interface name as the guest sees it (e.g. <code>ens4</code> on GCP Ubuntu, <code>ens5</code> on AWS nitro, <code>eth0</code> on older kernels).</td>
+</tr>
+<tr>
+<td><code>dhcp4</code></td>
+<td>bool</td>
+<td><code>false</code></td>
+<td>Whether netplan should also try DHCP4 on the interface.</td>
+</tr>
+<tr>
+<td><code>addresses</code></td>
+<td>list(string)</td>
+<td><code>[]</code></td>
+<td>Static IPv4 (and&#x2F;or IPv6) addresses in CIDR form, e.g. <code>[&quot;10.0.0.5/24&quot;]</code>.</td>
+</tr>
+<tr>
+<td><code>gateway4</code></td>
+<td>string</td>
+<td><code>null</code></td>
+<td>Default IPv4 gateway.</td>
+</tr>
+<tr>
+<td><code>nameservers</code></td>
+<td>list(string)</td>
+<td><code>[]</code></td>
+<td>DNS resolver IPs.</td>
+</tr>
+<tr>
+<td><code>mtu</code></td>
+<td>number</td>
+<td><code>null</code></td>
+<td>MTU override (e.g. <code>1460</code> on GCP, <code>9001</code> for jumbo frames on AWS).</td>
+</tr>
+</tbody></table>
+<h3><span id="example-static-ip-on-aws">Example (static IP on AWS)</span></h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">module &quot;publisher&quot; &#123;</span><br><span class="line">  source  = &quot;johnneerdael/publisher/netskope//modules/aws&quot;</span><br><span class="line">  version = &quot;~&gt; 2.3&quot;</span><br><span class="line"></span><br><span class="line">  tenant_url = var.netskope_tenant_url</span><br><span class="line">  api_token  = var.netskope_api_token</span><br><span class="line"></span><br><span class="line">  subnet_id          = var.subnet_id</span><br><span class="line">  security_group_ids = [var.security_group_id]</span><br><span class="line">  bootstrap          = true</span><br><span class="line"></span><br><span class="line">  guest_network_interface = &#123;</span><br><span class="line">    name        = &quot;ens5&quot;</span><br><span class="line">    dhcp4       = false</span><br><span class="line">    addresses   = [&quot;10.0.0.5/24&quot;]</span><br><span class="line">    gateway4    = &quot;10.0.0.1&quot;</span><br><span class="line">    nameservers = [&quot;8.8.8.8&quot;, &quot;1.1.1.1&quot;]</span><br><span class="line">    mtu         = 9001</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>Static IPs on AWS &#x2F; Azure &#x2F; GCP still need to fall <strong>inside</strong> the<br>subnet’s CIDR and not collide with reservations or DHCP pools — the<br>module does not coordinate with the cloud’s IPAM.</p>
+</blockquote>
+<p>Leave <code>guest_network_interface = null</code> (the default) to let the image’s<br>own DHCP setup handle the interface unchanged.</p>
+<h2><span id="notes">Notes</span></h2><ul>
+<li>The module does not validate that egress is reachable. If<br>registration hangs, that’s usually the first thing to check.</li>
+</ul>
+
+        
+  </div>
+</article>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2026
+    John Neerdael
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/terraform-netskope-publisher/">Home</a></li><!--
+     --><!--
+       --><li><a href="/terraform-netskope-publisher/starter/">starter</a></li><!--
+     --><!--
+       --><li><a href="/terraform-netskope-publisher/admin/">admin</a></li><!--
+     --><!--
+       --><li><a href="/terraform-netskope-publisher/reference/">reference</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/johnneerdael/terraform-netskope-publisher">github</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+
+<script src="/terraform-netskope-publisher/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+<footer class="version-footer" style="text-align:center; padding:1rem 0; opacity:0.6; font-size:0.85rem;">Applies to terraform-netskope-publisher v2.x</footer></body>
+</html>
